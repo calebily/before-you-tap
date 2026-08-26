@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Before You Tap helps older adults check suspicious images and audio messages."
+    />
+    <title>Before You Tap</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">A calm second opinion</p>
+        <h1>Before You Tap</h1>
+        <p class="intro">
+          Check a suspicious message or audio file before you reply, call back, pay, or share
+          private information.
+        </p>
+      </header>
+
+      <section aria-labelledby="choose-heading" class="card">
+        <p class="step-label">Step 1 of 2</p>
+        <h2 id="choose-heading">What would you like to check?</h2>
+        <p id="choice-help">Choose one of the clearly marked buttons below.</p>
+
+        <div class="choice-grid" aria-describedby="choice-help">
+          <button class="choice-button next-action" data-kind="image" type="button">
+            <span class="choice-icon" aria-hidden="true">▣</span>
+            <span>
+              <strong>Check an image</strong>
+              <small>Photo, screenshot, email, text, chat, or letter</small>
+            </span>
+          </button>
+
+          <button class="choice-button" data-kind="audio" type="button">
+            <span class="choice-icon" aria-hidden="true">▶</span>
+            <span>
+              <strong>Check an audio message</strong>
+              <small>Voicemail, voice message, or saved audio file</small>
+            </span>
+          </button>
+        </div>
+
+        <div aria-live="polite" class="selection" id="selection" hidden>
+          <h3 id="selection-title"></h3>
+          <p>
+            File upload and Gemini analysis will be connected in the next development stage.
+          </p>
+        </div>
+      </section>
+
+      <aside class="privacy-note">
+        <strong>Your choice stays in your control.</strong>
+        <span>The app will never listen to live calls or turn on your microphone in the background.</span>
+      </aside>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
+
