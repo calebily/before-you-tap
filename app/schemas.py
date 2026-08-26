@@ -32,4 +32,16 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     model: str
+    ai_provider: str
+    ai_configured: bool
     cloud_configured: bool
+
+
+class UploadValidationResponse(BaseModel):
+    filename: str
+    media_kind: MediaKind
+    content_type: str
+    size_bytes: int
+    ai_provider: str
+    ai_configured: bool
+    message: str

@@ -19,6 +19,16 @@ button {
   font: inherit;
 }
 
+.visually-hidden {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .shell {
   width: min(880px, calc(100% - 32px));
   margin: 0 auto;
@@ -47,6 +57,12 @@ h1 {
 h2 {
   margin: 8px 0 10px;
   font-size: clamp(1.65rem, 4vw, 2.2rem);
+}
+
+h3 {
+  margin: 8px 0 10px;
+  font-size: 1.35rem;
+  line-height: 1.3;
 }
 
 .intro {
@@ -137,6 +153,91 @@ h2 {
   background: #eef4ff;
 }
 
+.upload-action,
+.primary-action,
+.secondary-action {
+  min-height: 56px;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.upload-action,
+.primary-action {
+  border: 3px solid #174ea6;
+  background: #174ea6;
+  color: #ffffff;
+}
+
+.upload-action {
+  margin-top: 12px;
+}
+
+.secondary-action {
+  border: 2px solid #7787a6;
+  background: #ffffff;
+  color: #172033;
+}
+
+.upload-action:hover,
+.upload-action:focus-visible,
+.primary-action:hover,
+.primary-action:focus-visible,
+.secondary-action:hover,
+.secondary-action:focus-visible {
+  outline: 4px solid #f5b700;
+  outline-offset: 3px;
+}
+
+.primary-action:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.image-preview {
+  margin-top: 24px;
+}
+
+.image-preview img {
+  width: min(100%, 520px);
+  max-height: 420px;
+  display: block;
+  object-fit: contain;
+  border: 2px solid #aebbd3;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.file-details {
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.upload-status {
+  margin-top: 20px;
+  padding: 16px;
+  border: 2px solid #3156a3;
+  border-radius: 14px;
+  background: #ffffff;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.upload-status[data-state="error"] {
+  border-color: #9b2c2c;
+}
+
 .privacy-note {
   display: grid;
   gap: 6px;
@@ -159,4 +260,3 @@ h2 {
     transition: none !important;
   }
 }
-

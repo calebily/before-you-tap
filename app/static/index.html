@@ -13,7 +13,7 @@
   <body>
     <main class="shell">
       <header class="hero">
-        <p class="eyebrow">A calm second opinion</p>
+        <p class="eyebrow">Check before you act</p>
         <h1>Before You Tap</h1>
         <p class="intro">
           Check a suspicious message or audio file before you reply, call back, pay, or share
@@ -44,11 +44,52 @@
           </button>
         </div>
 
-        <div aria-live="polite" class="selection" id="selection" hidden>
-          <h3 id="selection-title"></h3>
-          <p>
-            File upload and Gemini analysis will be connected in the next development stage.
-          </p>
+        <div class="selection" id="selection" hidden>
+          <p class="step-label">Step 2 of 2</p>
+
+          <section aria-labelledby="image-upload-title" id="image-upload-panel" hidden>
+            <h3 id="image-upload-title" tabindex="-1">Choose the image you want to check</h3>
+            <p>
+              Use a screenshot or photo. Your file will be checked before it is sent to the AI
+              service.
+            </p>
+
+            <label class="upload-action next-action" for="image-input">
+              <span aria-hidden="true">＋</span>
+              <span>Choose an image</span>
+            </label>
+            <input
+              accept="image/jpeg,image/png,image/webp"
+              capture="environment"
+              class="visually-hidden"
+              id="image-input"
+              name="file"
+              type="file"
+            />
+
+            <div class="image-preview" id="image-preview" hidden>
+              <img alt="Preview of the selected image" id="preview-image" />
+              <p class="file-details" id="file-details"></p>
+              <div class="preview-actions">
+                <button class="primary-action next-action" id="validate-upload" type="button">
+                  Check this image
+                </button>
+                <button class="secondary-action" id="change-image" type="button">
+                  Choose a different image
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section aria-labelledby="audio-coming-title" id="audio-coming-panel" hidden>
+            <h3 id="audio-coming-title" tabindex="-1">Audio upload is coming next</h3>
+            <p>
+              The audio button is reserved for saved voicemails and voice messages. It will never
+              listen to a live call or turn on your microphone in the background.
+            </p>
+          </section>
+
+          <div aria-live="polite" class="upload-status" id="upload-status" role="status" hidden></div>
         </div>
       </section>
 
@@ -60,4 +101,3 @@
     <script src="/static/app.js"></script>
   </body>
 </html>
-

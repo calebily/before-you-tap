@@ -1,11 +1,17 @@
-from pathlib import Path
+from pathlib import Path, PurePath
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.schemas import HealthResponse
+from app.schemas import HealthResponse, UploadValidationResponse
+from app.services.file_validation import (
+    FileValidationError,
+    validate_file_content,
+    validate_upload,
+)
 
 APP_DIR = Path(__file__).resolve().parent
 STATIC_DIR = APP_DIR / "static"
@@ -30,5 +36,44 @@ async def healthz() -> HealthResponse:
         status="ok",
         service="before-you-tap",
         model=settings.gemini_model,
+        ai_provider=settings.ai_provider,
+        ai_configured=settings.ai_configured,
         cloud_configured=settings.cloud_configured,
+    )
+
+
+@app.post("/api/uploads/validate", response_model=UploadValidationResponse)
+async def validate_selected_file(
+    file: Annotated[UploadFile, File(...)],
+) -> UploadValidationResponse:
+    settings = get_settings()
+    content = await file.read(settings.max_upload_bytes + 1)
+
+    try:
+        validated_file = validate_upload(
+            content_type=file.content_type,
+            size_bytes=len(content),
+            max_bytes=settings.max_upload_bytes,
+        )
+        validate_file_content(validated_file=validated_file, content=content)
+    except FileValidationError as exc:
+        error_status = (
+            status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+            if "too large" in str(exc).lower()
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(status_code=error_status, detail=str(exc)) from exc
+    finally:
+        await file.close()
+
+    raw_filename = file.filename or "selected file"
+    safe_filename = PurePath(raw_filename.replace("\\", "/")).name
+    return UploadValidationResponse(
+        filename=safe_filename,
+        media_kind=validated_file.media_kind,
+        content_type=validated_file.content_type,
+        size_bytes=validated_file.size_bytes,
+        ai_provider=settings.ai_provider,
+        ai_configured=settings.ai_configured,
+        message="The file is ready. AI analysis is not connected yet.",
     )
