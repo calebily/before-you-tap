@@ -19,6 +19,7 @@ const audioPlayer = document.querySelector("#audio-player");
 const audioFileDetails = document.querySelector("#audio-file-details");
 const checkAudioButton = document.querySelector("#check-audio");
 const changeAudioButton = document.querySelector("#change-audio");
+const removeAudioButton = document.querySelector("#remove-audio");
 const uploadStatus = document.querySelector("#upload-status");
 const analysisResult = document.querySelector("#analysis-result");
 const riskBadge = document.querySelector("#risk-badge");
@@ -48,6 +49,8 @@ let previewUrls = [];
 let selectionMode = "replace";
 let selectedAudioFile = null;
 let audioPreviewUrl = null;
+let activeMode = null;
+const resultsByMode = { image: null, audio: null };
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} bytes`;
@@ -67,7 +70,7 @@ function resetStatus() {
   delete uploadStatus.dataset.state;
 }
 
-function resetResult() {
+function clearRenderedResult() {
   analysisResult.hidden = true;
   delete analysisResult.dataset.risk;
   riskBadge.textContent = "";
@@ -79,6 +82,11 @@ function resetResult() {
   uncertaintySection.hidden = true;
 }
 
+function clearModeResult(mode) {
+  resultsByMode[mode] = null;
+  if (activeMode === mode) clearRenderedResult();
+}
+
 function appendTextList(container, items) {
   items.forEach((item) => {
     const listItem = document.createElement("li");
@@ -87,7 +95,7 @@ function appendTextList(container, items) {
   });
 }
 
-function showResult(payload) {
+function renderResult(payload, { focus = true } = {}) {
   const riskCopy = {
     low_concern: { label: "Low concern", state: "low" },
     be_careful: { label: "Be careful", state: "careful" },
@@ -125,7 +133,12 @@ function showResult(payload) {
 
   appendTextList(nextStepsList, payload.safe_next_steps);
   analysisResult.hidden = false;
-  analysisResult.focus();
+  if (focus) analysisResult.focus();
+}
+
+function saveResult(payload, mode) {
+  resultsByMode[mode] = payload;
+  if (activeMode === mode) renderResult(payload);
 }
 
 function revokePreviewUrls() {
@@ -174,7 +187,7 @@ function selectAudioFile(file) {
 
   selectedAudioFile = file;
   resetStatus();
-  resetResult();
+  clearModeResult("audio");
   renderAudioPreview();
   return true;
 }
@@ -183,14 +196,14 @@ function moveImage(fromIndex, toIndex) {
   if (toIndex < 0 || toIndex >= selectedFiles.length) return;
   const [movedFile] = selectedFiles.splice(fromIndex, 1);
   selectedFiles.splice(toIndex, 0, movedFile);
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
 }
 
 function removeImage(index) {
   selectedFiles.splice(index, 1);
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
 }
 
@@ -271,10 +284,13 @@ buttons.forEach((button) => {
     });
     selection.hidden = false;
     const isImage = button.dataset.kind === "image";
+    activeMode = button.dataset.kind;
     imagePanel.hidden = !isImage;
     audioPanel.hidden = isImage;
     resetStatus();
-    resetResult();
+    clearRenderedResult();
+    const savedResult = resultsByMode[activeMode];
+    if (savedResult) renderResult(savedResult, { focus: false });
     (isImage ? imageTitle : audioTitle).focus();
   });
 });
@@ -292,7 +308,7 @@ addImageButton.addEventListener("click", () => {
 clearImagesButton.addEventListener("click", () => {
   selectedFiles = [];
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
   chooseImagesAction.focus();
 });
@@ -318,7 +334,7 @@ imageInput.addEventListener("change", () => {
 
   selectedFiles = candidateFiles;
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
 });
 
@@ -358,6 +374,14 @@ changeAudioButton.addEventListener("click", () => {
   audioInput.click();
 });
 
+removeAudioButton.addEventListener("click", () => {
+  selectedAudioFile = null;
+  audioInput.value = "";
+  resetStatus();
+  clearModeResult("audio");
+  renderAudioPreview();
+});
+
 validateButton.addEventListener("click", async () => {
   if (selectedFiles.length === 0) {
     showStatus("Please choose at least one image first.", "error");
@@ -369,7 +393,7 @@ validateButton.addEventListener("click", async () => {
   clearImagesButton.disabled = true;
   validateButton.textContent = "Checking for warning signs…";
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   const imageWord = selectedFiles.length === 1 ? "image" : "images";
   showStatus(`Gemini is reviewing ${selectedFiles.length} ${imageWord}. This can take a few seconds.`);
 
@@ -388,7 +412,7 @@ validateButton.addEventListener("click", async () => {
     }
 
     resetStatus();
-    showResult(payload);
+    saveResult(payload, "image");
   } catch (error) {
     showStatus(error.message, "error");
   } finally {
@@ -408,9 +432,10 @@ checkAudioButton.addEventListener("click", async () => {
 
   checkAudioButton.disabled = true;
   changeAudioButton.disabled = true;
+  removeAudioButton.disabled = true;
   checkAudioButton.textContent = "Checking for warning signs…";
   resetStatus();
-  resetResult();
+  clearModeResult("audio");
   showStatus("Gemini is reviewing the saved audio. This can take a few seconds.");
 
   const formData = new FormData();
@@ -428,12 +453,13 @@ checkAudioButton.addEventListener("click", async () => {
     }
 
     resetStatus();
-    showResult(payload);
+    saveResult(payload, "audio");
   } catch (error) {
     showStatus(error.message, "error");
   } finally {
     checkAudioButton.disabled = false;
     changeAudioButton.disabled = false;
+    removeAudioButton.disabled = false;
     checkAudioButton.textContent = "Check this audio message";
   }
 });
