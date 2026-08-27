@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Before You Tap helps older adults check suspicious images and audio messages."
+    />
+    <title>Before You Tap</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Check before you act</p>
+        <h1>Before You Tap</h1>
+        <p class="intro">
+          Check a suspicious message or audio file before you reply, call back, pay, or share
+          private information.
+        </p>
+      </header>
+
+      <section aria-labelledby="choose-heading" class="card">
+        <p class="step-label">Step 1 of 2</p>
+        <h2 id="choose-heading">What would you like to check?</h2>
+        <p id="choice-help">Choose one of the clearly marked buttons below.</p>
+
+        <div class="choice-grid" aria-describedby="choice-help">
+          <button class="choice-button next-action" data-kind="image" type="button">
+            <span class="choice-icon" aria-hidden="true">▣</span>
+            <span>
+              <strong>Check an image</strong>
+              <small>Photo, screenshot, email, text, chat, or letter</small>
+            </span>
+          </button>
+
+          <button class="choice-button" data-kind="audio" type="button">
+            <span class="choice-icon" aria-hidden="true">▶</span>
+            <span>
+              <strong>Check an audio message</strong>
+              <small>Voicemail, voice message, or saved audio file</small>
+            </span>
+          </button>
+        </div>
+
+        <div class="selection" id="selection" hidden>
+          <p class="step-label">Step 2 of 2</p>
+
+          <section aria-labelledby="image-upload-title" id="image-upload-panel" hidden>
+            <h3 id="image-upload-title" tabindex="-1">Choose the image pages you want to check</h3>
+            <p>
+              Add up to 5 screenshots or photos from the same email, message, or document, in
+              reading order. When you press <strong>Check these images</strong>, they are sent
+              securely to Google Gemini on Vertex AI for this check. Before You Tap does not
+              intentionally store them.
+            </p>
+
+            <label class="upload-action next-action" for="image-input" id="choose-images">
+              <span aria-hidden="true">＋</span>
+              <span>Choose one or more images</span>
+            </label>
+            <input
+              accept="image/jpeg,image/png,image/webp"
+              class="visually-hidden"
+              id="image-input"
+              multiple
+              name="files"
+              type="file"
+            />
+
+            <div class="image-preview" id="image-preview" hidden>
+              <p class="file-details" id="file-details"></p>
+              <div class="preview-list" id="preview-list"></div>
+              <div class="preview-actions">
+                <button class="primary-action next-action" id="validate-upload" type="button">
+                  Check these images
+                </button>
+                <button class="secondary-action" id="add-image" type="button">
+                  Add another image
+                </button>
+                <button class="secondary-action" id="clear-images" type="button">
+                  Clear all
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section aria-labelledby="audio-coming-title" id="audio-coming-panel" hidden>
+            <h3 id="audio-coming-title" tabindex="-1">Audio upload is coming next</h3>
+            <p>
+              The audio button is reserved for saved voicemails and voice messages. It will never
+              listen to a live call or turn on your microphone in the background.
+            </p>
+          </section>
+
+          <div aria-live="polite" class="upload-status" id="upload-status" role="status" hidden></div>
+
+          <section
+            aria-labelledby="result-title"
+            class="analysis-result"
+            id="analysis-result"
+            tabindex="-1"
+            hidden
+          >
+            <div class="risk-heading">
+              <p class="risk-badge" id="risk-badge"></p>
+              <h3 id="result-title">Your safety check</h3>
+            </div>
+            <p class="result-summary" id="result-summary"></p>
+
+            <div id="warning-section" hidden>
+              <h4>What stood out</h4>
+              <div class="warning-list" id="warning-list"></div>
+            </div>
+
+            <div id="uncertainty-section" hidden>
+              <h4>What we cannot confirm from the supplied content</h4>
+              <ul id="uncertainty-list"></ul>
+            </div>
+
+            <div class="next-steps">
+              <h4>What to do next</h4>
+              <ol id="next-steps-list"></ol>
+            </div>
+
+            <p class="result-reminder">
+              This is a second opinion, not a guarantee. If you are unsure, pause and talk to
+              someone you trust.
+            </p>
+          </section>
+        </div>
+      </section>
+
+      <aside class="privacy-note">
+        <strong>Your choice stays in your control.</strong>
+        <span>The app will never listen to live calls or turn on your microphone in the background.</span>
+      </aside>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+from enum import StrEnum
+
+from pydantic import BaseModel, Field
+
+
+class MediaKind(StrEnum):
+    IMAGE = "image"
+    AUDIO = "audio"
+
+
+class RiskLevel(StrEnum):
+    LOW_CONCERN = "low_concern"
+    BE_CAREFUL = "be_careful"
+    HIGH_RISK = "high_risk"
+
+
+class WarningSign(BaseModel):
+    title: str = Field(min_length=1, max_length=80)
+    evidence: str = Field(min_length=1, max_length=240)
+    explanation: str = Field(min_length=1, max_length=320)
+
+
+class AnalysisResult(BaseModel):
+    risk_level: RiskLevel
+    summary: str = Field(min_length=1, max_length=360)
+    warning_signs: list[WarningSign] = Field(default_factory=list, max_length=5)
+    uncertainty: list[str] = Field(default_factory=list, max_length=3)
+    safe_next_steps: list[str] = Field(min_length=1, max_length=3)
+
+
+class HealthResponse(BaseModel):
+    status: str
+    service: str
+    model: str
+    ai_provider: str
+    ai_configured: bool
+    cloud_configured: bool
+
+
+class UploadValidationResponse(BaseModel):
+    filename: str
+    media_kind: MediaKind
+    content_type: str
+    size_bytes: int
+    ai_provider: str
+    ai_configured: bool
+    message: str
