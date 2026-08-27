@@ -1,5 +1,8 @@
 const buttons = [...document.querySelectorAll(".choice-button")];
+const startSection = document.querySelector(".start");
 const selection = document.querySelector("#selection");
+const listenToggle = document.querySelector("#listen-toggle");
+const listenLabel = document.querySelector("#listen-label");
 const imagePanel = document.querySelector("#image-upload-panel");
 const audioPanel = document.querySelector("#audio-upload-panel");
 const imageTitle = document.querySelector("#image-upload-title");
@@ -13,6 +16,7 @@ const fileDetails = document.querySelector("#file-details");
 const validateButton = document.querySelector("#validate-upload");
 const clearImagesButton = document.querySelector("#clear-images");
 const audioDropZone = document.querySelector("#audio-drop-zone");
+const chooseAudioAction = document.querySelector("#choose-audio");
 const audioInput = document.querySelector("#audio-input");
 const audioPreview = document.querySelector("#audio-preview");
 const audioPlayer = document.querySelector("#audio-player");
@@ -23,12 +27,17 @@ const removeAudioButton = document.querySelector("#remove-audio");
 const uploadStatus = document.querySelector("#upload-status");
 const analysisResult = document.querySelector("#analysis-result");
 const riskBadge = document.querySelector("#risk-badge");
+const resultTitle = document.querySelector("#result-title");
 const resultSummary = document.querySelector("#result-summary");
+const nextSteps = document.querySelector(".next-steps");
 const warningSection = document.querySelector("#warning-section");
 const warningList = document.querySelector("#warning-list");
 const uncertaintySection = document.querySelector("#uncertainty-section");
 const uncertaintyList = document.querySelector("#uncertainty-list");
 const nextStepsList = document.querySelector("#next-steps-list");
+const fullReportToggle = document.querySelector("#full-report-toggle");
+const fullReport = document.querySelector("#full-report");
+const hideFullReportButton = document.querySelector("#hide-full-report");
 
 const maxImages = 5;
 const maxTotalBytes = 20 * 1024 * 1024;
@@ -52,7 +61,45 @@ let selectionMode = "replace";
 let selectedAudioFile = null;
 let audioPreviewUrl = null;
 let activeMode = null;
+let readAloudEnabled = false;
 const resultsByMode = { image: null, audio: null };
+
+function stopSpeaking() {
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+}
+
+function speakText(text) {
+  if (!readAloudEnabled || !("speechSynthesis" in window)) return;
+  stopSpeaking();
+  const message = new SpeechSynthesisUtterance(text.replace(/\s+/g, " ").trim());
+  message.lang = "en-AU";
+  message.rate = 0.9;
+  window.speechSynthesis.speak(message);
+}
+
+function currentReadingText() {
+  if (!analysisResult.hidden) {
+    if (!fullReport.hidden) return fullReport.innerText;
+    return `${riskBadge.innerText}. ${resultTitle.innerText}. ${resultSummary.innerText}. ${nextSteps.innerText}`;
+  }
+
+  if (!selection.hidden) {
+    const activePanel = activeMode === "image" ? imagePanel : audioPanel;
+    return activePanel.innerText;
+  }
+
+  return startSection.innerText;
+}
+
+if (!("speechSynthesis" in window)) listenToggle.hidden = true;
+
+listenToggle.addEventListener("click", () => {
+  readAloudEnabled = !readAloudEnabled;
+  listenToggle.setAttribute("aria-pressed", String(readAloudEnabled));
+  listenLabel.textContent = readAloudEnabled ? "Listening" : "Listen";
+  if (readAloudEnabled) speakText(currentReadingText());
+  else stopSpeaking();
+});
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} bytes`;
@@ -76,12 +123,16 @@ function clearRenderedResult() {
   analysisResult.hidden = true;
   delete analysisResult.dataset.risk;
   riskBadge.textContent = "";
+  resultTitle.textContent = "";
   resultSummary.textContent = "";
   warningList.replaceChildren();
   uncertaintyList.replaceChildren();
   nextStepsList.replaceChildren();
   warningSection.hidden = true;
   uncertaintySection.hidden = true;
+  fullReport.hidden = true;
+  fullReportToggle.hidden = false;
+  fullReportToggle.setAttribute("aria-expanded", "false");
 }
 
 function clearModeResult(mode) {
@@ -98,15 +149,21 @@ function appendTextList(container, items) {
 }
 
 function renderResult(payload, { focus = true } = {}) {
+  clearRenderedResult();
   const riskCopy = {
-    low_concern: { label: "Low concern", state: "low" },
-    be_careful: { label: "Be careful", state: "careful" },
-    high_risk: { label: "High risk", state: "high" },
+    low_concern: {
+      label: "Low concern",
+      state: "low",
+      title: "No strong warning signs found.",
+    },
+    be_careful: { label: "Be careful", state: "careful", title: "Pause and check first." },
+    high_risk: { label: "High risk", state: "high", title: "Stop. Do not act yet." },
   };
   const risk = riskCopy[payload.risk_level] ?? riskCopy.be_careful;
 
   analysisResult.dataset.risk = risk.state;
   riskBadge.textContent = risk.label;
+  resultTitle.textContent = risk.title;
   resultSummary.textContent = payload.summary;
 
   if (payload.warning_signs.length > 0) {
@@ -136,6 +193,7 @@ function renderResult(payload, { focus = true } = {}) {
   appendTextList(nextStepsList, payload.safe_next_steps);
   analysisResult.hidden = false;
   if (focus) analysisResult.focus();
+  speakText(`${risk.label}. ${risk.title} ${payload.summary}. ${nextSteps.innerText}`);
 }
 
 function saveResult(payload, mode) {
@@ -322,13 +380,40 @@ buttons.forEach((button) => {
     clearRenderedResult();
     const savedResult = resultsByMode[activeMode];
     if (savedResult) renderResult(savedResult, { focus: false });
-    (isImage ? imageTitle : audioTitle).focus();
+    const activeTitle = isImage ? imageTitle : audioTitle;
+    activeTitle.focus({ preventScroll: true });
+    selection.scrollIntoView({ behavior: "smooth", block: "start" });
+    speakText((isImage ? imagePanel : audioPanel).innerText);
   });
+});
+
+fullReportToggle.addEventListener("click", () => {
+  fullReport.hidden = false;
+  fullReportToggle.hidden = true;
+  fullReportToggle.setAttribute("aria-expanded", "true");
+  fullReport.focus({ preventScroll: true });
+  fullReport.scrollIntoView({ behavior: "smooth", block: "start" });
+  speakText(fullReport.innerText);
+});
+
+hideFullReportButton.addEventListener("click", () => {
+  fullReport.hidden = true;
+  fullReportToggle.hidden = false;
+  fullReportToggle.setAttribute("aria-expanded", "false");
+  fullReportToggle.focus({ preventScroll: true });
+  analysisResult.scrollIntoView({ behavior: "smooth", block: "start" });
+  speakText(`${riskBadge.innerText}. ${resultTitle.innerText}. ${resultSummary.innerText}`);
 });
 
 chooseImagesAction.addEventListener("click", () => {
   selectionMode = selectedFiles.length === 0 ? "replace" : "add";
   imageInput.value = "";
+  imageInput.click();
+});
+
+chooseAudioAction.addEventListener("click", () => {
+  audioInput.value = "";
+  audioInput.click();
 });
 
 clearImagesButton.addEventListener("click", () => {

@@ -3,7 +3,7 @@
 An AI safety companion that helps older adults analyse suspicious images and audio messages before they act.
 
 > Status: multi-image and saved-audio selection, secure upload validation, Gemini risk analysis,
-> and an accessible results view are working.
+> and a mobile-first accessible results view are working.
 
 ## MVP
 
@@ -19,6 +19,11 @@ The UI asks users to keep unrelated emails or conversations in separate checks. 
 items are supplied accidentally, the model is instructed not to combine them into one narrative.
 Audio checks accept one MP3, M4A, WAV, OGG, or WebM file up to 20 MB. It does not monitor live
 calls or activate a microphone in the background.
+
+The responsive interface uses large touch targets and a calm, high-contrast design. It shows a
+short risk result and immediate next steps first, then lets the user expand the evidence and
+uncertainty with **See the full report**. An optional read-aloud control uses browser speech
+synthesis where it is supported.
 
 Read the approved [MVP specification](docs/MVP_SPEC.md).
 

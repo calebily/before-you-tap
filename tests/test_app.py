@@ -13,13 +13,17 @@ def test_home_page_loads() -> None:
 
     assert response.status_code == 200
     assert "Before You Tap" in response.text
+    assert "Check before you act." in response.text
+    assert "Photo or screenshot" in response.text
     assert "Check an audio message" in response.text
+    assert "Listen" in response.text
     assert "Drag image pages here" in response.text
-    assert "Paste a screenshot" in response.text
-    assert "Check unrelated messages separately" in response.text
+    assert "paste a screenshot" in response.text
+    assert "Check unrelated emails or conversations separately" in response.text
     assert "Add another image" not in response.text
     assert "Drag an audio file here" in response.text
     assert "Remove audio" in response.text
+    assert "See the full report" in response.text
 
 
 def test_health_check_is_safe_without_cloud_credentials() -> None:
