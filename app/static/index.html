@@ -86,12 +86,39 @@
             </div>
           </section>
 
-          <section aria-labelledby="audio-coming-title" id="audio-coming-panel" hidden>
-            <h3 id="audio-coming-title" tabindex="-1">Audio upload is coming next</h3>
+          <section aria-labelledby="audio-upload-title" id="audio-upload-panel" hidden>
+            <h3 id="audio-upload-title" tabindex="-1">Choose the audio message you want to check</h3>
             <p>
-              The audio button is reserved for saved voicemails and voice messages. It will never
-              listen to a live call or turn on your microphone in the background.
+              Choose a saved voicemail, voice message, or audio file. When you press
+              <strong>Check this audio message</strong>, it is sent securely to Google Gemini on
+              Vertex AI for this check. Before You Tap does not intentionally store it. The app
+              never listens to a live call or turns on your microphone.
             </p>
+
+            <label class="upload-action next-action" for="audio-input" id="choose-audio">
+              <span aria-hidden="true">＋</span>
+              <span>Choose an audio file</span>
+            </label>
+            <input
+              accept="audio/mpeg,audio/mp3,audio/mp4,audio/m4a,audio/x-m4a,audio/wav,audio/x-wav,audio/ogg,audio/webm,.mp3,.m4a,.wav,.ogg,.webm"
+              class="visually-hidden"
+              id="audio-input"
+              name="file"
+              type="file"
+            />
+
+            <div class="audio-preview" id="audio-preview" hidden>
+              <audio controls id="audio-player"></audio>
+              <p class="file-details" id="audio-file-details"></p>
+              <div class="preview-actions">
+                <button class="primary-action next-action" id="check-audio" type="button">
+                  Check this audio message
+                </button>
+                <button class="secondary-action" id="change-audio" type="button">
+                  Choose a different audio file
+                </button>
+              </div>
+            </div>
           </section>
 
           <div aria-live="polite" class="upload-status" id="upload-status" role="status" hidden></div>

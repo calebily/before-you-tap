@@ -213,6 +213,19 @@ h5 {
   margin-top: 24px;
 }
 
+.audio-preview {
+  margin-top: 24px;
+  padding: 18px;
+  border: 2px solid #aebbd3;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.audio-preview audio {
+  width: 100%;
+  min-height: 54px;
+}
+
 .preview-list {
   display: grid;
   gap: 16px;

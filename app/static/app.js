@@ -1,9 +1,9 @@
 const buttons = [...document.querySelectorAll(".choice-button")];
 const selection = document.querySelector("#selection");
 const imagePanel = document.querySelector("#image-upload-panel");
-const audioPanel = document.querySelector("#audio-coming-panel");
+const audioPanel = document.querySelector("#audio-upload-panel");
 const imageTitle = document.querySelector("#image-upload-title");
-const audioTitle = document.querySelector("#audio-coming-title");
+const audioTitle = document.querySelector("#audio-upload-title");
 const chooseImagesAction = document.querySelector("#choose-images");
 const imageInput = document.querySelector("#image-input");
 const imagePreview = document.querySelector("#image-preview");
@@ -12,6 +12,13 @@ const fileDetails = document.querySelector("#file-details");
 const validateButton = document.querySelector("#validate-upload");
 const addImageButton = document.querySelector("#add-image");
 const clearImagesButton = document.querySelector("#clear-images");
+const chooseAudioAction = document.querySelector("#choose-audio");
+const audioInput = document.querySelector("#audio-input");
+const audioPreview = document.querySelector("#audio-preview");
+const audioPlayer = document.querySelector("#audio-player");
+const audioFileDetails = document.querySelector("#audio-file-details");
+const checkAudioButton = document.querySelector("#check-audio");
+const changeAudioButton = document.querySelector("#change-audio");
 const uploadStatus = document.querySelector("#upload-status");
 const analysisResult = document.querySelector("#analysis-result");
 const riskBadge = document.querySelector("#risk-badge");
@@ -27,6 +34,8 @@ const maxTotalBytes = 20 * 1024 * 1024;
 let selectedFiles = [];
 let previewUrls = [];
 let selectionMode = "replace";
+let selectedAudioFile = null;
+let audioPreviewUrl = null;
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} bytes`;
@@ -110,6 +119,32 @@ function showResult(payload) {
 function revokePreviewUrls() {
   previewUrls.forEach((url) => URL.revokeObjectURL(url));
   previewUrls = [];
+}
+
+function revokeAudioPreviewUrl() {
+  if (!audioPreviewUrl) return;
+  URL.revokeObjectURL(audioPreviewUrl);
+  audioPreviewUrl = null;
+}
+
+function renderAudioPreview() {
+  revokeAudioPreviewUrl();
+
+  if (!selectedAudioFile) {
+    audioPlayer.removeAttribute("src");
+    audioPlayer.load();
+    audioFileDetails.textContent = "";
+    audioPreview.hidden = true;
+    chooseAudioAction.hidden = false;
+    return;
+  }
+
+  audioPreviewUrl = URL.createObjectURL(selectedAudioFile);
+  audioPlayer.src = audioPreviewUrl;
+  audioFileDetails.textContent = `${selectedAudioFile.name} · ${formatBytes(selectedAudioFile.size)}`;
+  chooseAudioAction.hidden = true;
+  audioPreview.hidden = false;
+  checkAudioButton.focus();
 }
 
 function moveImage(fromIndex, toIndex) {
@@ -255,6 +290,27 @@ imageInput.addEventListener("change", () => {
   renderPreviews();
 });
 
+audioInput.addEventListener("change", () => {
+  const [file] = audioInput.files;
+  if (!file) return;
+
+  if (file.size > maxTotalBytes) {
+    showStatus("The selected audio file is over the 20 MB limit.", "error");
+    audioInput.value = "";
+    return;
+  }
+
+  selectedAudioFile = file;
+  resetStatus();
+  resetResult();
+  renderAudioPreview();
+});
+
+changeAudioButton.addEventListener("click", () => {
+  audioInput.value = "";
+  audioInput.click();
+});
+
 validateButton.addEventListener("click", async () => {
   if (selectedFiles.length === 0) {
     showStatus("Please choose at least one image first.", "error");
@@ -297,4 +353,45 @@ validateButton.addEventListener("click", async () => {
   }
 });
 
-window.addEventListener("beforeunload", revokePreviewUrls);
+checkAudioButton.addEventListener("click", async () => {
+  if (!selectedAudioFile) {
+    showStatus("Please choose an audio file first.", "error");
+    return;
+  }
+
+  checkAudioButton.disabled = true;
+  changeAudioButton.disabled = true;
+  checkAudioButton.textContent = "Checking for warning signs…";
+  resetStatus();
+  resetResult();
+  showStatus("Gemini is reviewing the saved audio. This can take a few seconds.");
+
+  const formData = new FormData();
+  formData.append("file", selectedAudioFile);
+
+  try {
+    const response = await fetch("/api/analyse/audio", {
+      method: "POST",
+      body: formData,
+    });
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload.detail || "The audio message could not be checked.");
+    }
+
+    resetStatus();
+    showResult(payload);
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    checkAudioButton.disabled = false;
+    changeAudioButton.disabled = false;
+    checkAudioButton.textContent = "Check this audio message";
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  revokePreviewUrls();
+  revokeAudioPreviewUrl();
+});

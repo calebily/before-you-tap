@@ -163,3 +163,56 @@ def test_image_analysis_enforces_the_combined_size_limit(monkeypatch) -> None:
 
     assert response.status_code == 413
     assert "too large together" in response.json()["detail"]
+
+
+def test_analyses_saved_audio_without_storing_it(monkeypatch) -> None:
+    expected = AnalysisResult(
+        risk_level=RiskLevel.HIGH_RISK,
+        summary="The caller uses pressure and asks for private banking information.",
+        warning_signs=[
+            WarningSign(
+                title="Request for private information",
+                evidence="The caller asks for the listener's banking password.",
+                explanation="A legitimate organisation should not ask for a password by phone.",
+            )
+        ],
+        uncertainty=["The caller's identity cannot be confirmed from the audio."],
+        safe_next_steps=[
+            "Pause. Do not call back, pay, follow instructions, or share information.",
+            "Contact the bank using the number on the back of your card.",
+            "Talk to someone you trust before taking action.",
+        ],
+    )
+
+    def fake_analyse_audio(*, audio_bytes, content_type, settings):
+        assert audio_bytes.endswith(b"fictional voicemail")
+        assert content_type == "audio/wav"
+        assert settings.gemini_model == "gemini-3.5-flash"
+        return expected
+
+    monkeypatch.setattr(main_module, "analyse_audio", fake_analyse_audio)
+    wav = b"RIFF\x00\x00\x00\x00WAVEfictional voicemail"
+
+    response = client.post(
+        "/api/analyse/audio",
+        files={"file": ("fictional-voicemail.wav", wav, "audio/wav")},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected.model_dump(mode="json")
+
+
+def test_audio_analysis_rejects_an_image_before_calling_gemini(monkeypatch) -> None:
+    def fail_if_called(**kwargs):
+        raise AssertionError("Gemini should not be called for an image on the audio endpoint.")
+
+    monkeypatch.setattr(main_module, "analyse_audio", fail_if_called)
+    png = b"\x89PNG\r\n\x1a\nfictional"
+
+    response = client.post(
+        "/api/analyse/audio",
+        files={"file": ("fictional-message.png", png, "image/png")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Please choose a supported audio file only."

@@ -2,8 +2,8 @@
 
 An AI safety companion that helps older adults analyse suspicious images and audio messages before they act.
 
-> Status: image selection, secure upload validation, Gemini risk analysis, and an accessible
-> results view are working. Audio upload is the next development stage.
+> Status: multi-image and saved-audio selection, secure upload validation, Gemini risk analysis,
+> and an accessible results view are working.
 
 ## MVP
 
@@ -14,7 +14,8 @@ Before You Tap accepts user-selected:
 
 The agent considers all selected pages together and returns a plain-language risk assessment, the
 warning signs it found, uncertainty, and safe next steps. Image uploads are limited to five files
-and 20 MB in total. It does not monitor live calls or activate a microphone in the background.
+and 20 MB in total. Audio checks accept one MP3, M4A, WAV, OGG, or WebM file up to 20 MB. It does
+not monitor live calls or activate a microphone in the background.
 
 Read the approved [MVP specification](docs/MVP_SPEC.md).
 
