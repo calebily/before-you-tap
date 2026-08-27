@@ -11,6 +11,14 @@ const fileDetails = document.querySelector("#file-details");
 const validateButton = document.querySelector("#validate-upload");
 const changeImageButton = document.querySelector("#change-image");
 const uploadStatus = document.querySelector("#upload-status");
+const analysisResult = document.querySelector("#analysis-result");
+const riskBadge = document.querySelector("#risk-badge");
+const resultSummary = document.querySelector("#result-summary");
+const warningSection = document.querySelector("#warning-section");
+const warningList = document.querySelector("#warning-list");
+const uncertaintySection = document.querySelector("#uncertainty-section");
+const uncertaintyList = document.querySelector("#uncertainty-list");
+const nextStepsList = document.querySelector("#next-steps-list");
 
 let selectedFile = null;
 let previewUrl = null;
@@ -33,6 +41,67 @@ function resetStatus() {
   delete uploadStatus.dataset.state;
 }
 
+function resetResult() {
+  analysisResult.hidden = true;
+  delete analysisResult.dataset.risk;
+  riskBadge.textContent = "";
+  resultSummary.textContent = "";
+  warningList.replaceChildren();
+  uncertaintyList.replaceChildren();
+  nextStepsList.replaceChildren();
+  warningSection.hidden = true;
+  uncertaintySection.hidden = true;
+}
+
+function appendTextList(container, items) {
+  items.forEach((item) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = item;
+    container.append(listItem);
+  });
+}
+
+function showResult(payload) {
+  const riskCopy = {
+    low_concern: { label: "Low concern", state: "low" },
+    be_careful: { label: "Be careful", state: "careful" },
+    high_risk: { label: "High risk", state: "high" },
+  };
+  const risk = riskCopy[payload.risk_level] ?? riskCopy.be_careful;
+
+  analysisResult.dataset.risk = risk.state;
+  riskBadge.textContent = risk.label;
+  resultSummary.textContent = payload.summary;
+
+  if (payload.warning_signs.length > 0) {
+    payload.warning_signs.forEach((warning) => {
+      const card = document.createElement("article");
+      card.className = "warning-item";
+
+      const title = document.createElement("h5");
+      title.textContent = warning.title;
+      const evidence = document.createElement("p");
+      evidence.className = "warning-evidence";
+      evidence.textContent = warning.evidence;
+      const explanation = document.createElement("p");
+      explanation.textContent = warning.explanation;
+
+      card.append(title, evidence, explanation);
+      warningList.append(card);
+    });
+    warningSection.hidden = false;
+  }
+
+  if (payload.uncertainty.length > 0) {
+    appendTextList(uncertaintyList, payload.uncertainty);
+    uncertaintySection.hidden = false;
+  }
+
+  appendTextList(nextStepsList, payload.safe_next_steps);
+  analysisResult.hidden = false;
+  analysisResult.focus();
+}
+
 buttons.forEach((button) => {
   button.setAttribute("aria-pressed", "false");
   button.addEventListener("click", () => {
@@ -44,6 +113,7 @@ buttons.forEach((button) => {
     imagePanel.hidden = !isImage;
     audioPanel.hidden = isImage;
     resetStatus();
+    resetResult();
     (isImage ? imageTitle : audioTitle).focus();
   });
 });
@@ -51,6 +121,7 @@ buttons.forEach((button) => {
 imageInput.addEventListener("change", () => {
   selectedFile = imageInput.files[0] ?? null;
   resetStatus();
+  resetResult();
 
   if (previewUrl) {
     URL.revokeObjectURL(previewUrl);
@@ -78,14 +149,16 @@ validateButton.addEventListener("click", async () => {
   }
 
   validateButton.disabled = true;
-  validateButton.textContent = "Checking the file…";
+  validateButton.textContent = "Checking for warning signs…";
   resetStatus();
+  resetResult();
+  showStatus("Gemini is reviewing the image. This can take a few seconds.");
 
   const formData = new FormData();
   formData.append("file", selectedFile);
 
   try {
-    const response = await fetch("/api/uploads/validate", {
+    const response = await fetch("/api/analyse/image", {
       method: "POST",
       body: formData,
     });
@@ -95,10 +168,8 @@ validateButton.addEventListener("click", async () => {
       throw new Error(payload.detail || "The image could not be checked.");
     }
 
-    const aiMessage = payload.ai_configured
-      ? "The Gemini connection is ready for the next step."
-      : "Gemini is not connected yet, so no risk result has been created.";
-    showStatus(`${payload.filename} is a supported image. ${aiMessage}`);
+    resetStatus();
+    showResult(payload);
   } catch (error) {
     showStatus(error.message, "error");
   } finally {

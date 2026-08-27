@@ -50,8 +50,9 @@
           <section aria-labelledby="image-upload-title" id="image-upload-panel" hidden>
             <h3 id="image-upload-title" tabindex="-1">Choose the image you want to check</h3>
             <p>
-              Use a screenshot or photo. Your file will be checked before it is sent to the AI
-              service.
+              Use a screenshot or photo. When you press <strong>Check this image</strong>, it is
+              sent securely to Google Gemini on Vertex AI for this check. Before You Tap does not
+              intentionally store it.
             </p>
 
             <label class="upload-action next-action" for="image-input">
@@ -90,6 +91,40 @@
           </section>
 
           <div aria-live="polite" class="upload-status" id="upload-status" role="status" hidden></div>
+
+          <section
+            aria-labelledby="result-title"
+            class="analysis-result"
+            id="analysis-result"
+            tabindex="-1"
+            hidden
+          >
+            <div class="risk-heading">
+              <p class="risk-badge" id="risk-badge"></p>
+              <h3 id="result-title">Your safety check</h3>
+            </div>
+            <p class="result-summary" id="result-summary"></p>
+
+            <div id="warning-section" hidden>
+              <h4>What stood out</h4>
+              <div class="warning-list" id="warning-list"></div>
+            </div>
+
+            <div id="uncertainty-section" hidden>
+              <h4>What we cannot confirm from this image</h4>
+              <ul id="uncertainty-list"></ul>
+            </div>
+
+            <div class="next-steps">
+              <h4>What to do next</h4>
+              <ol id="next-steps-list"></ol>
+            </div>
+
+            <p class="result-reminder">
+              This is a second opinion, not a guarantee. If you are unsure, pause and talk to
+              someone you trust.
+            </p>
+          </section>
         </div>
       </section>
 

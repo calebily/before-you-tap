@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
 
+import app.main as main_module
 from app.main import app
+from app.schemas import AnalysisResult, RiskLevel, WarningSign
 
 client = TestClient(app)
 
@@ -65,3 +67,55 @@ def test_rejects_an_unsupported_upload_type() -> None:
 
     assert response.status_code == 400
     assert "supported image or audio" in response.json()["detail"]
+
+
+def test_analyses_an_image_without_storing_it(monkeypatch) -> None:
+    expected = AnalysisResult(
+        risk_level=RiskLevel.HIGH_RISK,
+        summary="This message shows several common scam warning signs.",
+        warning_signs=[
+            WarningSign(
+                title="Urgent payment request",
+                evidence="The message says payment is required immediately.",
+                explanation="Pressure to pay quickly can stop you from checking the request.",
+            )
+        ],
+        uncertainty=["The sender's identity cannot be confirmed from the image alone."],
+        safe_next_steps=[
+            "Pause. Do not reply, pay, click links, or share information.",
+            "Contact the organisation using a number from its official website.",
+            "Talk to someone you trust before taking action.",
+        ],
+    )
+
+    def fake_analyse_image(*, image_bytes, content_type, settings):
+        assert image_bytes.startswith(b"\x89PNG")
+        assert content_type == "image/png"
+        assert settings.gemini_model == "gemini-3.5-flash"
+        return expected
+
+    monkeypatch.setattr(main_module, "analyse_image", fake_analyse_image)
+    png = b"\x89PNG\r\n\x1a\n" + b"fictional image bytes"
+
+    response = client.post(
+        "/api/analyse/image",
+        files={"file": ("fictional-scam.png", png, "image/png")},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected.model_dump(mode="json")
+
+
+def test_image_analysis_rejects_audio_before_calling_gemini(monkeypatch) -> None:
+    def fail_if_called(**kwargs):
+        raise AssertionError("Gemini should not be called for audio on the image endpoint.")
+
+    monkeypatch.setattr(main_module, "analyse_image", fail_if_called)
+
+    response = client.post(
+        "/api/analyse/image",
+        files={"file": ("fictional-message.mp3", b"ID3fictional", "audio/mpeg")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Please choose a supported image file."

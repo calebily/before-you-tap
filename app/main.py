@@ -2,16 +2,19 @@ from pathlib import Path, PurePath
 from typing import Annotated
 
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.schemas import HealthResponse, UploadValidationResponse
+from app.schemas import AnalysisResult, HealthResponse, MediaKind, UploadValidationResponse
 from app.services.file_validation import (
     FileValidationError,
     validate_file_content,
     validate_upload,
 )
+from app.services.gemini_client import GeminiConfigurationError
+from app.services.image_analysis import ImageAnalysisError, analyse_image
 
 APP_DIR = Path(__file__).resolve().parent
 STATIC_DIR = APP_DIR / "static"
@@ -77,3 +80,47 @@ async def validate_selected_file(
         ai_configured=settings.ai_configured,
         message="The file is ready. AI analysis is not connected yet.",
     )
+
+
+@app.post("/api/analyse/image", response_model=AnalysisResult)
+async def analyse_selected_image(
+    file: Annotated[UploadFile, File(...)],
+) -> AnalysisResult:
+    settings = get_settings()
+    content = await file.read(settings.max_upload_bytes + 1)
+
+    try:
+        validated_file = validate_upload(
+            content_type=file.content_type,
+            size_bytes=len(content),
+            max_bytes=settings.max_upload_bytes,
+        )
+        validate_file_content(validated_file=validated_file, content=content)
+        if validated_file.media_kind is not MediaKind.IMAGE:
+            raise FileValidationError("Please choose a supported image file.")
+
+        return await run_in_threadpool(
+            analyse_image,
+            image_bytes=content,
+            content_type=validated_file.content_type,
+            settings=settings,
+        )
+    except FileValidationError as exc:
+        error_status = (
+            status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+            if "too large" in str(exc).lower()
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(status_code=error_status, detail=str(exc)) from exc
+    except GeminiConfigurationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The AI check is not configured yet. Please try again after setup is complete.",
+        ) from exc
+    except ImageAnalysisError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="We could not complete the AI check just now. Please try again in a moment.",
+        ) from exc
+    finally:
+        await file.close()

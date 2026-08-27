@@ -2,8 +2,8 @@
 
 An AI safety companion that helps older adults analyse suspicious images and audio messages before they act.
 
-> Status: image selection, preview, and secure upload validation are working. Gemini risk
-> analysis and audio upload are the next development stages.
+> Status: image selection, secure upload validation, Gemini risk analysis, and an accessible
+> results view are working. Audio upload is the next development stage.
 
 ## MVP
 
@@ -36,10 +36,11 @@ uvicorn app.main:app --reload --port 8080
 
 Open <http://localhost:8080>. Health check: <http://localhost:8080/healthz>.
 
-The default configuration does not call an AI service. For local development, the app is ready
-to use the Gemini API free tier through Google AI Studio after `GOOGLE_API_KEY` is added to the
-local `.env`. Never commit that file or share the key. For the final Google Cloud deployment, set
-`GOOGLE_GENAI_USE_VERTEXAI=true` and provide `GOOGLE_CLOUD_PROJECT` instead.
+The default configuration does not call an AI service. The recommended local setup uses Vertex AI
+with Application Default Credentials (ADC): set `GOOGLE_GENAI_USE_VERTEXAI=true` and add your
+`GOOGLE_CLOUD_PROJECT` to the local `.env`, then run `gcloud auth application-default login`.
+The `.env` and ADC credential file must never be committed or shared. Google AI Studio API-key
+development is also supported by setting `GOOGLE_API_KEY` while Vertex AI is disabled.
 
 Run tests:
 
@@ -51,8 +52,7 @@ pytest
 
 - Do not commit credentials, real private messages, or real voicemail files.
 - Demo and test assets must be fictional and non-sensitive.
-- Uploaded content will be processed only for the current analysis and will not be intentionally retained in the MVP.
-- Uploaded files are currently read only for validation and immediately discarded.
+- Uploaded content is processed in memory for the current analysis and is not intentionally retained by the app.
 - The UI must clearly disclose cloud-AI processing before a user uploads a file.
 
 ## Repository layout

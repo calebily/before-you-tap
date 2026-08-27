@@ -15,16 +15,16 @@ class RiskLevel(StrEnum):
 
 
 class WarningSign(BaseModel):
-    title: str
-    evidence: str
-    explanation: str
+    title: str = Field(min_length=1, max_length=80)
+    evidence: str = Field(min_length=1, max_length=240)
+    explanation: str = Field(min_length=1, max_length=320)
 
 
 class AnalysisResult(BaseModel):
     risk_level: RiskLevel
-    summary: str
-    warning_signs: list[WarningSign] = Field(default_factory=list)
-    uncertainty: list[str] = Field(default_factory=list)
+    summary: str = Field(min_length=1, max_length=360)
+    warning_signs: list[WarningSign] = Field(default_factory=list, max_length=5)
+    uncertainty: list[str] = Field(default_factory=list, max_length=3)
     safe_next_steps: list[str] = Field(min_length=1, max_length=3)
 
 
