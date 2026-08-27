@@ -40,7 +40,7 @@ def test_logo_asset_loads() -> None:
 
 
 def test_health_check_is_safe_without_cloud_credentials() -> None:
-    response = client.get("/healthz")
+    response = client.get("/api/health")
 
     assert response.status_code == 200
     assert response.json() == {
