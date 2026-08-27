@@ -9,10 +9,12 @@ An AI safety companion that helps older adults analyse suspicious images and aud
 
 Before You Tap accepts user-selected:
 
-- images of suspicious messages, emails, chats, or letters; and
+- up to five ordered images of one suspicious message, email, chat, or letter; and
 - existing audio files such as voicemails and voice messages.
 
-The agent will return a plain-language risk assessment, the warning signs it found, uncertainty, and safe next steps. It does not monitor live calls or activate a microphone in the background.
+The agent considers all selected pages together and returns a plain-language risk assessment, the
+warning signs it found, uncertainty, and safe next steps. Image uploads are limited to five files
+and 20 MB in total. It does not monitor live calls or activate a microphone in the background.
 
 Read the approved [MVP specification](docs/MVP_SPEC.md).
 

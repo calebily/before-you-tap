@@ -4,12 +4,14 @@ const imagePanel = document.querySelector("#image-upload-panel");
 const audioPanel = document.querySelector("#audio-coming-panel");
 const imageTitle = document.querySelector("#image-upload-title");
 const audioTitle = document.querySelector("#audio-coming-title");
+const chooseImagesAction = document.querySelector("#choose-images");
 const imageInput = document.querySelector("#image-input");
 const imagePreview = document.querySelector("#image-preview");
-const previewImage = document.querySelector("#preview-image");
+const previewList = document.querySelector("#preview-list");
 const fileDetails = document.querySelector("#file-details");
 const validateButton = document.querySelector("#validate-upload");
-const changeImageButton = document.querySelector("#change-image");
+const addImageButton = document.querySelector("#add-image");
+const clearImagesButton = document.querySelector("#clear-images");
 const uploadStatus = document.querySelector("#upload-status");
 const analysisResult = document.querySelector("#analysis-result");
 const riskBadge = document.querySelector("#risk-badge");
@@ -20,8 +22,11 @@ const uncertaintySection = document.querySelector("#uncertainty-section");
 const uncertaintyList = document.querySelector("#uncertainty-list");
 const nextStepsList = document.querySelector("#next-steps-list");
 
-let selectedFile = null;
-let previewUrl = null;
+const maxImages = 5;
+const maxTotalBytes = 20 * 1024 * 1024;
+let selectedFiles = [];
+let previewUrls = [];
+let selectionMode = "replace";
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} bytes`;
@@ -102,6 +107,95 @@ function showResult(payload) {
   analysisResult.focus();
 }
 
+function revokePreviewUrls() {
+  previewUrls.forEach((url) => URL.revokeObjectURL(url));
+  previewUrls = [];
+}
+
+function moveImage(fromIndex, toIndex) {
+  if (toIndex < 0 || toIndex >= selectedFiles.length) return;
+  const [movedFile] = selectedFiles.splice(fromIndex, 1);
+  selectedFiles.splice(toIndex, 0, movedFile);
+  resetResult();
+  renderPreviews();
+}
+
+function removeImage(index) {
+  selectedFiles.splice(index, 1);
+  resetStatus();
+  resetResult();
+  renderPreviews();
+}
+
+function createPreviewCard(file, index) {
+  const card = document.createElement("article");
+  card.className = "preview-card";
+
+  const pageLabel = document.createElement("strong");
+  pageLabel.className = "page-label";
+  pageLabel.textContent = `Page ${index + 1}`;
+
+  const image = document.createElement("img");
+  const previewUrl = URL.createObjectURL(file);
+  previewUrls.push(previewUrl);
+  image.src = previewUrl;
+  image.alt = `Preview of page ${index + 1}`;
+
+  const name = document.createElement("p");
+  name.className = "preview-name";
+  name.textContent = file.name;
+
+  const controls = document.createElement("div");
+  controls.className = "preview-controls";
+
+  const moveEarlier = document.createElement("button");
+  moveEarlier.type = "button";
+  moveEarlier.textContent = "Move earlier";
+  moveEarlier.disabled = index === 0;
+  moveEarlier.addEventListener("click", () => moveImage(index, index - 1));
+
+  const moveLater = document.createElement("button");
+  moveLater.type = "button";
+  moveLater.textContent = "Move later";
+  moveLater.disabled = index === selectedFiles.length - 1;
+  moveLater.addEventListener("click", () => moveImage(index, index + 1));
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "Remove";
+  remove.addEventListener("click", () => removeImage(index));
+
+  controls.append(moveEarlier, moveLater, remove);
+  card.append(pageLabel, image, name, controls);
+  return card;
+}
+
+function renderPreviews() {
+  revokePreviewUrls();
+  previewList.replaceChildren();
+
+  if (selectedFiles.length === 0) {
+    imagePreview.hidden = true;
+    chooseImagesAction.hidden = false;
+    imageInput.value = "";
+    return;
+  }
+
+  selectedFiles.forEach((file, index) => {
+    previewList.append(createPreviewCard(file, index));
+  });
+
+  const totalBytes = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+  const imageWord = selectedFiles.length === 1 ? "image" : "images";
+  fileDetails.textContent = `${selectedFiles.length} ${imageWord} · ${formatBytes(totalBytes)} total`;
+  validateButton.textContent =
+    selectedFiles.length === 1 ? "Check this image" : "Check these images";
+  addImageButton.hidden = selectedFiles.length >= maxImages;
+  chooseImagesAction.hidden = true;
+  imagePreview.hidden = false;
+  validateButton.focus();
+}
+
 buttons.forEach((button) => {
   button.setAttribute("aria-pressed", "false");
   button.addEventListener("click", () => {
@@ -118,54 +212,76 @@ buttons.forEach((button) => {
   });
 });
 
-imageInput.addEventListener("change", () => {
-  selectedFile = imageInput.files[0] ?? null;
+chooseImagesAction.addEventListener("click", () => {
+  selectionMode = "replace";
+});
+
+addImageButton.addEventListener("click", () => {
+  selectionMode = "add";
+  imageInput.value = "";
+  imageInput.click();
+});
+
+clearImagesButton.addEventListener("click", () => {
+  selectedFiles = [];
   resetStatus();
   resetResult();
+  renderPreviews();
+  chooseImagesAction.focus();
+});
 
-  if (previewUrl) {
-    URL.revokeObjectURL(previewUrl);
-    previewUrl = null;
-  }
+imageInput.addEventListener("change", () => {
+  const incomingFiles = [...imageInput.files];
+  if (incomingFiles.length === 0) return;
 
-  if (!selectedFile) {
-    imagePreview.hidden = true;
+  const candidateFiles =
+    selectionMode === "add" ? [...selectedFiles, ...incomingFiles] : incomingFiles;
+  if (candidateFiles.length > maxImages) {
+    showStatus(`Please choose no more than ${maxImages} images for one check.`, "error");
+    imageInput.value = "";
     return;
   }
 
-  previewUrl = URL.createObjectURL(selectedFile);
-  previewImage.src = previewUrl;
-  fileDetails.textContent = `${selectedFile.name} · ${formatBytes(selectedFile.size)}`;
-  imagePreview.hidden = false;
-  validateButton.focus();
+  const totalBytes = candidateFiles.reduce((sum, file) => sum + file.size, 0);
+  if (totalBytes > maxTotalBytes) {
+    showStatus("The selected images are over the 20 MB total limit.", "error");
+    imageInput.value = "";
+    return;
+  }
+
+  selectedFiles = candidateFiles;
+  resetStatus();
+  resetResult();
+  renderPreviews();
 });
 
-changeImageButton.addEventListener("click", () => imageInput.click());
-
 validateButton.addEventListener("click", async () => {
-  if (!selectedFile) {
-    showStatus("Please choose an image first.", "error");
+  if (selectedFiles.length === 0) {
+    showStatus("Please choose at least one image first.", "error");
     return;
   }
 
   validateButton.disabled = true;
+  addImageButton.disabled = true;
+  clearImagesButton.disabled = true;
   validateButton.textContent = "Checking for warning signs…";
   resetStatus();
   resetResult();
-  showStatus("Gemini is reviewing the image. This can take a few seconds.");
+  const imageWord = selectedFiles.length === 1 ? "image" : "images";
+  showStatus(`Gemini is reviewing ${selectedFiles.length} ${imageWord}. This can take a few seconds.`);
 
   const formData = new FormData();
-  formData.append("file", selectedFile);
+  selectedFiles.forEach((file) => formData.append("files", file));
 
   try {
-    const response = await fetch("/api/analyse/image", {
+    const response = await fetch("/api/analyse/images", {
       method: "POST",
       body: formData,
     });
     const payload = await response.json();
 
     if (!response.ok) {
-      throw new Error(payload.detail || "The image could not be checked.");
+      throw new Error(payload.detail || "The images could not be checked.");
     }
 
     resetStatus();
@@ -174,10 +290,11 @@ validateButton.addEventListener("click", async () => {
     showStatus(error.message, "error");
   } finally {
     validateButton.disabled = false;
-    validateButton.textContent = "Check this image";
+    addImageButton.disabled = false;
+    clearImagesButton.disabled = false;
+    validateButton.textContent =
+      selectedFiles.length === 1 ? "Check this image" : "Check these images";
   }
 });
 
-window.addEventListener("beforeunload", () => {
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
-});
+window.addEventListener("beforeunload", revokePreviewUrls);

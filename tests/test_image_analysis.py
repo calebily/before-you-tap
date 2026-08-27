@@ -28,13 +28,17 @@ def test_builds_a_structured_multimodal_gemini_request(monkeypatch) -> None:
         google_cloud_project="fictional-project",
     )
 
-    result = image_analysis.analyse_image(
-        image_bytes=b"\x89PNG\r\n\x1a\nfictional",
-        content_type="image/png",
+    result = image_analysis.analyse_images(
+        image_items=[
+            (b"\x89PNG\r\n\x1a\npage one", "image/png"),
+            (b"\xff\xd8\xffpage two", "image/jpeg"),
+        ],
         settings=settings,
     )
 
     assert result == expected
     assert calls["model"] == "gemini-3.5-flash"
-    assert len(calls["contents"]) == 2
+    assert len(calls["contents"]) == 5
+    assert calls["contents"][1] == "Page 1 of 2:"
+    assert calls["contents"][3] == "Page 2 of 2:"
     assert calls["config"].response_mime_type == "application/json"

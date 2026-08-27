@@ -14,7 +14,7 @@ The product must feel like a calm companion, not a cold scanner. It uses plain E
 
 The web app supports two user-selected analysis modes:
 
-1. **Check an image:** Take a photo or upload a screenshot/photo of a suspicious text, email, chat, or letter. Initial formats: JPEG, PNG, and WebP.
+1. **Check images:** Take photos or upload up to five ordered screenshots/photos from the same suspicious text, email, chat, or letter. Initial formats: JPEG, PNG, and WebP, with a 20 MB combined limit.
 2. **Check an audio message:** Upload an existing voicemail, voice message, or other audio file that the user has chosen to analyse. Initial formats: MP3, M4A, WAV, OGG, and WebM.
 
 The MVP does **not** listen to live calls, activate the microphone in the background, or intercept phone audio.
@@ -22,7 +22,7 @@ The MVP does **not** listen to live calls, activate the microphone in the backgr
 ## 3. Core user journey
 
 1. The user selects **Check an image** or **Check an audio message**.
-2. The interface explains what will be processed and asks the user to choose a file.
+2. The interface explains what will be processed and asks the user to choose one or more ordered image pages, or one audio file.
 3. The agent verifies that the input is readable or audible enough to assess. If key information is missing, it asks for a clearer file or a short clarification.
 4. The agent extracts the relevant content and analyses scam signals, including urgency, secrecy, impersonation, payment or callback requests, suspicious links or phone numbers, remote-access instructions, threats, and requests for passwords, verification codes, banking details, or other private information.
 5. The result presents:
@@ -65,7 +65,7 @@ The MVP does **not** listen to live calls, activate the microphone in the backgr
 
 The MVP is complete when a judge can:
 
-1. Upload a suspicious image and receive an evidence-based risk assessment with safe next steps.
+1. Upload one or more ordered images from the same suspicious content and receive a combined evidence-based risk assessment with safe next steps.
 2. Upload a suspicious voicemail or voice message and receive the same structured assessment.
 3. See a helpful clarification request for an unreadable image or unclear audio file rather than a fabricated result.
 4. Ask a follow-up question that uses the current session context.

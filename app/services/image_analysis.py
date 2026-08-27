@@ -6,9 +6,10 @@ from app.schemas import AnalysisResult
 from app.services.gemini_client import build_gemini_client
 
 ANALYSIS_PROMPT = """
-You are the scam-safety partner inside Before You Tap. Review the user-selected image for
-possible scam or manipulation risk. The person reading your answer may be an older adult, so use
-calm, direct, plain English. Focus on what the image actually shows.
+You are the scam-safety partner inside Before You Tap. Review the user-selected image pages for
+possible scam or manipulation risk. The pages are supplied in order and belong to the same email,
+message, or document. Consider evidence across all pages together. The person reading your answer
+may be an older adult, so use calm, direct, plain English. Focus on what the images actually show.
 
 Assess warning signs such as urgency, threats, secrecy, impersonation, unusual payment methods,
 requests for passwords or verification codes, suspicious links or contact details, unexpected
@@ -31,16 +32,25 @@ class ImageAnalysisError(RuntimeError):
     """Raised when Gemini does not return a usable safety assessment."""
 
 
-def analyse_image(*, image_bytes: bytes, content_type: str, settings: Settings) -> AnalysisResult:
+def analyse_images(*, image_items: list[tuple[bytes, str]], settings: Settings) -> AnalysisResult:
+    if not image_items:
+        raise ImageAnalysisError("At least one image is required for analysis.")
+
     client = build_gemini_client(settings)
+
+    contents: list[str | types.Part] = [ANALYSIS_PROMPT]
+    for page_number, (image_bytes, content_type) in enumerate(image_items, start=1):
+        contents.extend(
+            [
+                f"Page {page_number} of {len(image_items)}:",
+                types.Part.from_bytes(data=image_bytes, mime_type=content_type),
+            ]
+        )
 
     try:
         response = client.models.generate_content(
             model=settings.gemini_model,
-            contents=[
-                ANALYSIS_PROMPT,
-                types.Part.from_bytes(data=image_bytes, mime_type=content_type),
-            ],
+            contents=contents,
             config=types.GenerateContentConfig(
                 temperature=0.1,
                 response_mime_type="application/json",

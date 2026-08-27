@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 import app.main as main_module
+from app.config import Settings
 from app.main import app
 from app.schemas import AnalysisResult, RiskLevel, WarningSign
 
@@ -45,7 +46,7 @@ def test_validates_a_real_png_signature_without_storing_the_file() -> None:
         "size_bytes": len(png),
         "ai_provider": "google_ai_studio",
         "ai_configured": False,
-        "message": "The file is ready. AI analysis is not connected yet.",
+        "message": "The file is valid and ready for analysis.",
     }
 
 
@@ -69,7 +70,7 @@ def test_rejects_an_unsupported_upload_type() -> None:
     assert "supported image or audio" in response.json()["detail"]
 
 
-def test_analyses_an_image_without_storing_it(monkeypatch) -> None:
+def test_analyses_ordered_images_together_without_storing_them(monkeypatch) -> None:
     expected = AnalysisResult(
         risk_level=RiskLevel.HIGH_RISK,
         summary="This message shows several common scam warning signs.",
@@ -88,18 +89,23 @@ def test_analyses_an_image_without_storing_it(monkeypatch) -> None:
         ],
     )
 
-    def fake_analyse_image(*, image_bytes, content_type, settings):
-        assert image_bytes.startswith(b"\x89PNG")
-        assert content_type == "image/png"
+    def fake_analyse_images(*, image_items, settings):
+        assert len(image_items) == 2
+        assert image_items[0][0].endswith(b"page one")
+        assert image_items[1][0].endswith(b"page two")
+        assert [item[1] for item in image_items] == ["image/png", "image/png"]
         assert settings.gemini_model == "gemini-3.5-flash"
         return expected
 
-    monkeypatch.setattr(main_module, "analyse_image", fake_analyse_image)
-    png = b"\x89PNG\r\n\x1a\n" + b"fictional image bytes"
+    monkeypatch.setattr(main_module, "analyse_images", fake_analyse_images)
+    png_header = b"\x89PNG\r\n\x1a\n"
 
     response = client.post(
-        "/api/analyse/image",
-        files={"file": ("fictional-scam.png", png, "image/png")},
+        "/api/analyse/images",
+        files=[
+            ("files", ("page-1.png", png_header + b"page one", "image/png")),
+            ("files", ("page-2.png", png_header + b"page two", "image/png")),
+        ],
     )
 
     assert response.status_code == 200
@@ -110,12 +116,50 @@ def test_image_analysis_rejects_audio_before_calling_gemini(monkeypatch) -> None
     def fail_if_called(**kwargs):
         raise AssertionError("Gemini should not be called for audio on the image endpoint.")
 
-    monkeypatch.setattr(main_module, "analyse_image", fail_if_called)
+    monkeypatch.setattr(main_module, "analyse_images", fail_if_called)
 
     response = client.post(
-        "/api/analyse/image",
-        files={"file": ("fictional-message.mp3", b"ID3fictional", "audio/mpeg")},
+        "/api/analyse/images",
+        files={"files": ("fictional-message.mp3", b"ID3fictional", "audio/mpeg")},
     )
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "Please choose a supported image file."
+    assert response.json()["detail"] == "Please choose supported image files only."
+
+
+def test_image_analysis_rejects_more_than_five_images(monkeypatch) -> None:
+    def fail_if_called(**kwargs):
+        raise AssertionError("Gemini should not be called for too many images.")
+
+    monkeypatch.setattr(main_module, "analyse_images", fail_if_called)
+    png = b"\x89PNG\r\n\x1a\nfictional"
+
+    response = client.post(
+        "/api/analyse/images",
+        files=[("files", (f"page-{number}.png", png, "image/png")) for number in range(6)],
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Please choose no more than 5 images."
+
+
+def test_image_analysis_enforces_the_combined_size_limit(monkeypatch) -> None:
+    def fail_if_called(**kwargs):
+        raise AssertionError("Gemini should not be called for an oversized group.")
+
+    settings = Settings(_env_file=None, max_upload_mb=1)
+    monkeypatch.setattr(main_module, "get_settings", lambda: settings)
+    monkeypatch.setattr(main_module, "analyse_images", fail_if_called)
+    png_header = b"\x89PNG\r\n\x1a\n"
+    large_page = png_header + (b"x" * 600_000)
+
+    response = client.post(
+        "/api/analyse/images",
+        files=[
+            ("files", ("page-1.png", large_page, "image/png")),
+            ("files", ("page-2.png", large_page, "image/png")),
+        ],
+    )
+
+    assert response.status_code == 413
+    assert "too large together" in response.json()["detail"]

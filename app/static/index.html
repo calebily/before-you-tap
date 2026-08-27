@@ -48,35 +48,39 @@
           <p class="step-label">Step 2 of 2</p>
 
           <section aria-labelledby="image-upload-title" id="image-upload-panel" hidden>
-            <h3 id="image-upload-title" tabindex="-1">Choose the image you want to check</h3>
+            <h3 id="image-upload-title" tabindex="-1">Choose the image pages you want to check</h3>
             <p>
-              Use a screenshot or photo. When you press <strong>Check this image</strong>, it is
-              sent securely to Google Gemini on Vertex AI for this check. Before You Tap does not
-              intentionally store it.
+              Add up to 5 screenshots or photos from the same email, message, or document, in
+              reading order. When you press <strong>Check these images</strong>, they are sent
+              securely to Google Gemini on Vertex AI for this check. Before You Tap does not
+              intentionally store them.
             </p>
 
-            <label class="upload-action next-action" for="image-input">
+            <label class="upload-action next-action" for="image-input" id="choose-images">
               <span aria-hidden="true">＋</span>
-              <span>Choose an image</span>
+              <span>Choose one or more images</span>
             </label>
             <input
               accept="image/jpeg,image/png,image/webp"
-              capture="environment"
               class="visually-hidden"
               id="image-input"
-              name="file"
+              multiple
+              name="files"
               type="file"
             />
 
             <div class="image-preview" id="image-preview" hidden>
-              <img alt="Preview of the selected image" id="preview-image" />
               <p class="file-details" id="file-details"></p>
+              <div class="preview-list" id="preview-list"></div>
               <div class="preview-actions">
                 <button class="primary-action next-action" id="validate-upload" type="button">
-                  Check this image
+                  Check these images
                 </button>
-                <button class="secondary-action" id="change-image" type="button">
-                  Choose a different image
+                <button class="secondary-action" id="add-image" type="button">
+                  Add another image
+                </button>
+                <button class="secondary-action" id="clear-images" type="button">
+                  Clear all
                 </button>
               </div>
             </div>
@@ -111,7 +115,7 @@
             </div>
 
             <div id="uncertainty-section" hidden>
-              <h4>What we cannot confirm from this image</h4>
+              <h4>What we cannot confirm from the supplied content</h4>
               <ul id="uncertainty-list"></ul>
             </div>
 
