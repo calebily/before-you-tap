@@ -12,7 +12,7 @@ const fileDetails = document.querySelector("#file-details");
 const validateButton = document.querySelector("#validate-upload");
 const addImageButton = document.querySelector("#add-image");
 const clearImagesButton = document.querySelector("#clear-images");
-const chooseAudioAction = document.querySelector("#choose-audio");
+const audioDropZone = document.querySelector("#audio-drop-zone");
 const audioInput = document.querySelector("#audio-input");
 const audioPreview = document.querySelector("#audio-preview");
 const audioPlayer = document.querySelector("#audio-player");
@@ -31,6 +31,18 @@ const nextStepsList = document.querySelector("#next-steps-list");
 
 const maxImages = 5;
 const maxTotalBytes = 20 * 1024 * 1024;
+const supportedAudioTypes = new Set([
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/mp4",
+  "audio/m4a",
+  "audio/x-m4a",
+  "audio/wav",
+  "audio/x-wav",
+  "audio/ogg",
+  "audio/webm",
+]);
+const supportedAudioExtension = /\.(mp3|m4a|wav|ogg|webm)$/i;
 let selectedFiles = [];
 let previewUrls = [];
 let selectionMode = "replace";
@@ -135,16 +147,36 @@ function renderAudioPreview() {
     audioPlayer.load();
     audioFileDetails.textContent = "";
     audioPreview.hidden = true;
-    chooseAudioAction.hidden = false;
+    audioDropZone.hidden = false;
     return;
   }
 
   audioPreviewUrl = URL.createObjectURL(selectedAudioFile);
   audioPlayer.src = audioPreviewUrl;
   audioFileDetails.textContent = `${selectedAudioFile.name} · ${formatBytes(selectedAudioFile.size)}`;
-  chooseAudioAction.hidden = true;
+  audioDropZone.hidden = true;
   audioPreview.hidden = false;
   checkAudioButton.focus();
+}
+
+function selectAudioFile(file) {
+  const hasSupportedType = supportedAudioTypes.has(file.type);
+  const hasSupportedExtension = supportedAudioExtension.test(file.name);
+  if (!hasSupportedType && !hasSupportedExtension) {
+    showStatus("Please choose an MP3, M4A, WAV, OGG, or WebM audio file.", "error");
+    return false;
+  }
+
+  if (file.size > maxTotalBytes) {
+    showStatus("The selected audio file is over the 20 MB limit.", "error");
+    return false;
+  }
+
+  selectedAudioFile = file;
+  resetStatus();
+  resetResult();
+  renderAudioPreview();
+  return true;
 }
 
 function moveImage(fromIndex, toIndex) {
@@ -293,17 +325,32 @@ imageInput.addEventListener("change", () => {
 audioInput.addEventListener("change", () => {
   const [file] = audioInput.files;
   if (!file) return;
+  if (!selectAudioFile(file)) audioInput.value = "";
+});
 
-  if (file.size > maxTotalBytes) {
-    showStatus("The selected audio file is over the 20 MB limit.", "error");
-    audioInput.value = "";
+["dragenter", "dragover"].forEach((eventName) => {
+  audioDropZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    audioDropZone.dataset.dragging = "true";
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  audioDropZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    delete audioDropZone.dataset.dragging;
+  });
+});
+
+audioDropZone.addEventListener("drop", (event) => {
+  const droppedFiles = [...event.dataTransfer.files];
+  if (droppedFiles.length !== 1) {
+    showStatus("Please drag one audio file at a time.", "error");
     return;
   }
-
-  selectedAudioFile = file;
-  resetStatus();
-  resetResult();
-  renderAudioPreview();
+  selectAudioFile(droppedFiles[0]);
 });
 
 changeAudioButton.addEventListener("click", () => {

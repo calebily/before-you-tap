@@ -14,6 +14,7 @@ def test_home_page_loads() -> None:
     assert response.status_code == 200
     assert "Before You Tap" in response.text
     assert "Check an audio message" in response.text
+    assert "Drag an audio file here" in response.text
 
 
 def test_health_check_is_safe_without_cloud_credentials() -> None:

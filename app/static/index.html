@@ -95,10 +95,15 @@
               never listens to a live call or turns on your microphone.
             </p>
 
-            <label class="upload-action next-action" for="audio-input" id="choose-audio">
-              <span aria-hidden="true">＋</span>
-              <span>Choose an audio file</span>
-            </label>
+            <div class="drop-zone" id="audio-drop-zone">
+              <p><strong>Drag an audio file here</strong></p>
+              <p class="drop-zone-or">or</p>
+              <label class="upload-action next-action" for="audio-input" id="choose-audio">
+                <span aria-hidden="true">＋</span>
+                <span>Choose an audio file</span>
+              </label>
+              <p class="upload-hint">MP3, M4A, WAV, OGG, or WebM · Maximum 20 MB</p>
+            </div>
             <input
               accept="audio/mpeg,audio/mp3,audio/mp4,audio/m4a,audio/x-m4a,audio/wav,audio/x-wav,audio/ogg,audio/webm,.mp3,.m4a,.wav,.ogg,.webm"
               class="visually-hidden"
