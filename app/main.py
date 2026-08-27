@@ -34,8 +34,8 @@ async def home() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
 
-@app.get("/healthz", response_model=HealthResponse)
-async def healthz() -> HealthResponse:
+@app.get("/api/health", response_model=HealthResponse)
+async def health() -> HealthResponse:
     settings = get_settings()
     return HealthResponse(
         status="ok",
