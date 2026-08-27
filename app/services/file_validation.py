@@ -7,7 +7,9 @@ ALLOWED_CONTENT_TYPES: dict[str, MediaKind] = {
     "image/png": MediaKind.IMAGE,
     "image/webp": MediaKind.IMAGE,
     "audio/mpeg": MediaKind.AUDIO,
+    "audio/mp3": MediaKind.AUDIO,
     "audio/mp4": MediaKind.AUDIO,
+    "audio/m4a": MediaKind.AUDIO,
     "audio/x-m4a": MediaKind.AUDIO,
     "audio/wav": MediaKind.AUDIO,
     "audio/x-wav": MediaKind.AUDIO,
@@ -34,11 +36,11 @@ def _matches_signature(content_type: str, content: bytes) -> bool:
         return content.startswith(b"\x89PNG\r\n\x1a\n")
     if content_type == "image/webp":
         return content.startswith(b"RIFF") and content[8:12] == b"WEBP"
-    if content_type == "audio/mpeg":
+    if content_type in {"audio/mpeg", "audio/mp3"}:
         return content.startswith(b"ID3") or (
             len(content) >= 2 and content[0] == 0xFF and content[1] & 0xE0 == 0xE0
         )
-    if content_type in {"audio/mp4", "audio/x-m4a"}:
+    if content_type in {"audio/mp4", "audio/m4a", "audio/x-m4a"}:
         return len(content) >= 12 and content[4:8] == b"ftyp"
     if content_type in {"audio/wav", "audio/x-wav"}:
         return content.startswith(b"RIFF") and content[8:12] == b"WAVE"

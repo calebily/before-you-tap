@@ -1,9 +1,9 @@
 const buttons = [...document.querySelectorAll(".choice-button")];
 const selection = document.querySelector("#selection");
 const imagePanel = document.querySelector("#image-upload-panel");
-const audioPanel = document.querySelector("#audio-coming-panel");
+const audioPanel = document.querySelector("#audio-upload-panel");
 const imageTitle = document.querySelector("#image-upload-title");
-const audioTitle = document.querySelector("#audio-coming-title");
+const audioTitle = document.querySelector("#audio-upload-title");
 const chooseImagesAction = document.querySelector("#choose-images");
 const imageInput = document.querySelector("#image-input");
 const imagePreview = document.querySelector("#image-preview");
@@ -12,6 +12,14 @@ const fileDetails = document.querySelector("#file-details");
 const validateButton = document.querySelector("#validate-upload");
 const addImageButton = document.querySelector("#add-image");
 const clearImagesButton = document.querySelector("#clear-images");
+const audioDropZone = document.querySelector("#audio-drop-zone");
+const audioInput = document.querySelector("#audio-input");
+const audioPreview = document.querySelector("#audio-preview");
+const audioPlayer = document.querySelector("#audio-player");
+const audioFileDetails = document.querySelector("#audio-file-details");
+const checkAudioButton = document.querySelector("#check-audio");
+const changeAudioButton = document.querySelector("#change-audio");
+const removeAudioButton = document.querySelector("#remove-audio");
 const uploadStatus = document.querySelector("#upload-status");
 const analysisResult = document.querySelector("#analysis-result");
 const riskBadge = document.querySelector("#risk-badge");
@@ -24,9 +32,25 @@ const nextStepsList = document.querySelector("#next-steps-list");
 
 const maxImages = 5;
 const maxTotalBytes = 20 * 1024 * 1024;
+const supportedAudioTypes = new Set([
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/mp4",
+  "audio/m4a",
+  "audio/x-m4a",
+  "audio/wav",
+  "audio/x-wav",
+  "audio/ogg",
+  "audio/webm",
+]);
+const supportedAudioExtension = /\.(mp3|m4a|wav|ogg|webm)$/i;
 let selectedFiles = [];
 let previewUrls = [];
 let selectionMode = "replace";
+let selectedAudioFile = null;
+let audioPreviewUrl = null;
+let activeMode = null;
+const resultsByMode = { image: null, audio: null };
 
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} bytes`;
@@ -46,7 +70,7 @@ function resetStatus() {
   delete uploadStatus.dataset.state;
 }
 
-function resetResult() {
+function clearRenderedResult() {
   analysisResult.hidden = true;
   delete analysisResult.dataset.risk;
   riskBadge.textContent = "";
@@ -58,6 +82,11 @@ function resetResult() {
   uncertaintySection.hidden = true;
 }
 
+function clearModeResult(mode) {
+  resultsByMode[mode] = null;
+  if (activeMode === mode) clearRenderedResult();
+}
+
 function appendTextList(container, items) {
   items.forEach((item) => {
     const listItem = document.createElement("li");
@@ -66,7 +95,7 @@ function appendTextList(container, items) {
   });
 }
 
-function showResult(payload) {
+function renderResult(payload, { focus = true } = {}) {
   const riskCopy = {
     low_concern: { label: "Low concern", state: "low" },
     be_careful: { label: "Be careful", state: "careful" },
@@ -104,7 +133,12 @@ function showResult(payload) {
 
   appendTextList(nextStepsList, payload.safe_next_steps);
   analysisResult.hidden = false;
-  analysisResult.focus();
+  if (focus) analysisResult.focus();
+}
+
+function saveResult(payload, mode) {
+  resultsByMode[mode] = payload;
+  if (activeMode === mode) renderResult(payload);
 }
 
 function revokePreviewUrls() {
@@ -112,18 +146,64 @@ function revokePreviewUrls() {
   previewUrls = [];
 }
 
+function revokeAudioPreviewUrl() {
+  if (!audioPreviewUrl) return;
+  URL.revokeObjectURL(audioPreviewUrl);
+  audioPreviewUrl = null;
+}
+
+function renderAudioPreview() {
+  revokeAudioPreviewUrl();
+
+  if (!selectedAudioFile) {
+    audioPlayer.removeAttribute("src");
+    audioPlayer.load();
+    audioFileDetails.textContent = "";
+    audioPreview.hidden = true;
+    audioDropZone.hidden = false;
+    return;
+  }
+
+  audioPreviewUrl = URL.createObjectURL(selectedAudioFile);
+  audioPlayer.src = audioPreviewUrl;
+  audioFileDetails.textContent = `${selectedAudioFile.name} · ${formatBytes(selectedAudioFile.size)}`;
+  audioDropZone.hidden = true;
+  audioPreview.hidden = false;
+  checkAudioButton.focus();
+}
+
+function selectAudioFile(file) {
+  const hasSupportedType = supportedAudioTypes.has(file.type);
+  const hasSupportedExtension = supportedAudioExtension.test(file.name);
+  if (!hasSupportedType && !hasSupportedExtension) {
+    showStatus("Please choose an MP3, M4A, WAV, OGG, or WebM audio file.", "error");
+    return false;
+  }
+
+  if (file.size > maxTotalBytes) {
+    showStatus("The selected audio file is over the 20 MB limit.", "error");
+    return false;
+  }
+
+  selectedAudioFile = file;
+  resetStatus();
+  clearModeResult("audio");
+  renderAudioPreview();
+  return true;
+}
+
 function moveImage(fromIndex, toIndex) {
   if (toIndex < 0 || toIndex >= selectedFiles.length) return;
   const [movedFile] = selectedFiles.splice(fromIndex, 1);
   selectedFiles.splice(toIndex, 0, movedFile);
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
 }
 
 function removeImage(index) {
   selectedFiles.splice(index, 1);
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
 }
 
@@ -204,10 +284,13 @@ buttons.forEach((button) => {
     });
     selection.hidden = false;
     const isImage = button.dataset.kind === "image";
+    activeMode = button.dataset.kind;
     imagePanel.hidden = !isImage;
     audioPanel.hidden = isImage;
     resetStatus();
-    resetResult();
+    clearRenderedResult();
+    const savedResult = resultsByMode[activeMode];
+    if (savedResult) renderResult(savedResult, { focus: false });
     (isImage ? imageTitle : audioTitle).focus();
   });
 });
@@ -225,7 +308,7 @@ addImageButton.addEventListener("click", () => {
 clearImagesButton.addEventListener("click", () => {
   selectedFiles = [];
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
   chooseImagesAction.focus();
 });
@@ -251,8 +334,52 @@ imageInput.addEventListener("change", () => {
 
   selectedFiles = candidateFiles;
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   renderPreviews();
+});
+
+audioInput.addEventListener("change", () => {
+  const [file] = audioInput.files;
+  if (!file) return;
+  if (!selectAudioFile(file)) audioInput.value = "";
+});
+
+["dragenter", "dragover"].forEach((eventName) => {
+  audioDropZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    audioDropZone.dataset.dragging = "true";
+  });
+});
+
+["dragleave", "drop"].forEach((eventName) => {
+  audioDropZone.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    delete audioDropZone.dataset.dragging;
+  });
+});
+
+audioDropZone.addEventListener("drop", (event) => {
+  const droppedFiles = [...event.dataTransfer.files];
+  if (droppedFiles.length !== 1) {
+    showStatus("Please drag one audio file at a time.", "error");
+    return;
+  }
+  selectAudioFile(droppedFiles[0]);
+});
+
+changeAudioButton.addEventListener("click", () => {
+  audioInput.value = "";
+  audioInput.click();
+});
+
+removeAudioButton.addEventListener("click", () => {
+  selectedAudioFile = null;
+  audioInput.value = "";
+  resetStatus();
+  clearModeResult("audio");
+  renderAudioPreview();
 });
 
 validateButton.addEventListener("click", async () => {
@@ -266,7 +393,7 @@ validateButton.addEventListener("click", async () => {
   clearImagesButton.disabled = true;
   validateButton.textContent = "Checking for warning signs…";
   resetStatus();
-  resetResult();
+  clearModeResult("image");
   const imageWord = selectedFiles.length === 1 ? "image" : "images";
   showStatus(`Gemini is reviewing ${selectedFiles.length} ${imageWord}. This can take a few seconds.`);
 
@@ -285,7 +412,7 @@ validateButton.addEventListener("click", async () => {
     }
 
     resetStatus();
-    showResult(payload);
+    saveResult(payload, "image");
   } catch (error) {
     showStatus(error.message, "error");
   } finally {
@@ -297,4 +424,47 @@ validateButton.addEventListener("click", async () => {
   }
 });
 
-window.addEventListener("beforeunload", revokePreviewUrls);
+checkAudioButton.addEventListener("click", async () => {
+  if (!selectedAudioFile) {
+    showStatus("Please choose an audio file first.", "error");
+    return;
+  }
+
+  checkAudioButton.disabled = true;
+  changeAudioButton.disabled = true;
+  removeAudioButton.disabled = true;
+  checkAudioButton.textContent = "Checking for warning signs…";
+  resetStatus();
+  clearModeResult("audio");
+  showStatus("Gemini is reviewing the saved audio. This can take a few seconds.");
+
+  const formData = new FormData();
+  formData.append("file", selectedAudioFile);
+
+  try {
+    const response = await fetch("/api/analyse/audio", {
+      method: "POST",
+      body: formData,
+    });
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload.detail || "The audio message could not be checked.");
+    }
+
+    resetStatus();
+    saveResult(payload, "audio");
+  } catch (error) {
+    showStatus(error.message, "error");
+  } finally {
+    checkAudioButton.disabled = false;
+    changeAudioButton.disabled = false;
+    removeAudioButton.disabled = false;
+    checkAudioButton.textContent = "Check this audio message";
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  revokePreviewUrls();
+  revokeAudioPreviewUrl();
+});

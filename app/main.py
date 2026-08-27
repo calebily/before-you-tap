@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
 from app.schemas import AnalysisResult, HealthResponse, MediaKind, UploadValidationResponse
+from app.services.audio_analysis import AudioAnalysisError, analyse_audio
 from app.services.file_validation import (
     FileValidationError,
     validate_file_content,
@@ -141,3 +142,47 @@ async def analyse_selected_images(
     finally:
         for file in files:
             await file.close()
+
+
+@app.post("/api/analyse/audio", response_model=AnalysisResult)
+async def analyse_selected_audio(
+    file: Annotated[UploadFile, File(...)],
+) -> AnalysisResult:
+    settings = get_settings()
+
+    try:
+        content = await file.read(settings.max_upload_bytes + 1)
+        validated_file = validate_upload(
+            content_type=file.content_type,
+            size_bytes=len(content),
+            max_bytes=settings.max_upload_bytes,
+        )
+        validate_file_content(validated_file=validated_file, content=content)
+        if validated_file.media_kind is not MediaKind.AUDIO:
+            raise FileValidationError("Please choose a supported audio file only.")
+
+        return await run_in_threadpool(
+            analyse_audio,
+            audio_bytes=content,
+            content_type=validated_file.content_type,
+            settings=settings,
+        )
+    except FileValidationError as exc:
+        error_status = (
+            status.HTTP_413_CONTENT_TOO_LARGE
+            if "too large" in str(exc).lower()
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(status_code=error_status, detail=str(exc)) from exc
+    except GeminiConfigurationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The AI check is not configured yet. Please try again after setup is complete.",
+        ) from exc
+    except AudioAnalysisError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="We could not complete the AI check just now. Please try again in a moment.",
+        ) from exc
+    finally:
+        await file.close()
