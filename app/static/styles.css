@@ -49,7 +49,7 @@ button:focus-visible,
 }
 
 .shell {
-  width: min(100% - 32px, 720px);
+  width: min(100% - 32px, 820px);
   margin: 0 auto;
   padding: 22px 0 56px;
 }
@@ -127,7 +127,7 @@ p {
 }
 
 h1 {
-  max-width: 620px;
+  max-width: 720px;
   margin: 10px 0 0;
   font-size: clamp(2.45rem, 12vw, 4.2rem);
   line-height: 1.02;
@@ -164,7 +164,7 @@ h5 {
 }
 
 .intro {
-  max-width: 600px;
+  max-width: 680px;
   margin: 16px 0 0;
   font-size: 1.08rem;
 }
@@ -339,6 +339,25 @@ h5 {
   color: #555550;
   font-size: 0.78rem;
   line-height: 1.45;
+}
+
+.upload-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.paste-action {
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.shortcut-hint {
+  color: #555550;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 .image-preview,
@@ -577,7 +596,7 @@ h5 {
 
 @media (max-width: 479px) {
   .shell {
-    width: min(100% - 28px, 720px);
+    width: min(100% - 28px, 820px);
     padding-top: 16px;
   }
 
@@ -607,6 +626,10 @@ h5 {
 
   .preview-actions > *,
   .full-report .secondary-action {
+    width: 100%;
+  }
+
+  .upload-options > * {
     width: 100%;
   }
 

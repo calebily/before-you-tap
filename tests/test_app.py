@@ -18,7 +18,9 @@ def test_home_page_loads() -> None:
     assert "Check an audio message" in response.text
     assert "Listen" in response.text
     assert "Drag image pages here" in response.text
-    assert "paste a screenshot" in response.text
+    assert "Paste an image" in response.text
+    assert "Command + V" in response.text
+    assert "Control + V" in response.text
     assert "Check unrelated emails or conversations separately" in response.text
     assert "Add another image" not in response.text
     assert "Drag an audio file here" in response.text

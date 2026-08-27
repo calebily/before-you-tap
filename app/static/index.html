@@ -66,13 +66,22 @@
 
           <div class="drop-zone" id="image-drop-zone">
             <p><strong>Drag image pages here</strong></p>
-            <p class="desktop-hint">or paste a screenshot anywhere on this page</p>
-            <button class="upload-action" id="choose-images" type="button">
-              <span aria-hidden="true">＋</span>
-              <span>Choose one or more images</span>
-            </button>
+            <p class="desktop-hint">or use one of the buttons below</p>
+            <div class="upload-options">
+              <button class="upload-action" id="choose-images" type="button">
+                <span aria-hidden="true">＋</span>
+                <span>Choose one or more images</span>
+              </button>
+              <button class="secondary-action paste-action" id="paste-image" type="button">
+                <span>Paste an image</span>
+                <span class="shortcut-hint" aria-hidden="true">⌘V / Ctrl+V</span>
+              </button>
+            </div>
             <p class="upload-hint">JPEG, PNG, or WebP · Up to 5 images · 20 MB total</p>
-            <p class="visually-hidden">Paste a screenshot with Command + V or Control + V.</p>
+            <p class="visually-hidden">
+              You can also paste a screenshot anywhere on this page with Command + V on a Mac or
+              Control + V on Windows.
+            </p>
           </div>
           <input
             accept="image/jpeg,image/png,image/webp"

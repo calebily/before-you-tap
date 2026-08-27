@@ -9,6 +9,7 @@ const imageTitle = document.querySelector("#image-upload-title");
 const audioTitle = document.querySelector("#audio-upload-title");
 const imageDropZone = document.querySelector("#image-drop-zone");
 const chooseImagesAction = document.querySelector("#choose-images");
+const pasteImageAction = document.querySelector("#paste-image");
 const imageInput = document.querySelector("#image-input");
 const imagePreview = document.querySelector("#image-preview");
 const previewList = document.querySelector("#preview-list");
@@ -409,6 +410,48 @@ chooseImagesAction.addEventListener("click", () => {
   selectionMode = selectedFiles.length === 0 ? "replace" : "add";
   imageInput.value = "";
   imageInput.click();
+});
+
+pasteImageAction.addEventListener("click", async () => {
+  if (!navigator.clipboard || typeof navigator.clipboard.read !== "function") {
+    showStatus(
+      "This browser cannot use the Paste button here. Press Command + V on a Mac or Control + V on Windows instead.",
+      "error",
+    );
+    return;
+  }
+
+  try {
+    const clipboardItems = await navigator.clipboard.read();
+    const pastedImages = [];
+
+    for (const item of clipboardItems) {
+      const imageTypes = item.types.filter((type) => type.startsWith("image/"));
+      for (const type of imageTypes) {
+        const blob = await item.getType(type);
+        const extension = type.split("/")[1]?.replace("jpeg", "jpg") || "png";
+        pastedImages.push(
+          new File([blob], `pasted-image-${pastedImages.length + 1}.${extension}`, { type }),
+        );
+      }
+    }
+
+    if (pastedImages.length === 0) {
+      showStatus("There is no image in your clipboard yet. Copy a screenshot, then try again.", "error");
+      return;
+    }
+
+    const mode = selectedFiles.length === 0 ? "replace" : "add";
+    selectImageFiles(pastedImages, mode);
+  } catch (error) {
+    const permissionWasDenied = error && error.name === "NotAllowedError";
+    showStatus(
+      permissionWasDenied
+        ? "Clipboard access was not allowed. Please allow it, or press Command + V on a Mac or Control + V on Windows."
+        : "We could not paste that image. Copy the screenshot again, then press Command + V or Control + V.",
+      "error",
+    );
+  }
 });
 
 chooseAudioAction.addEventListener("click", () => {

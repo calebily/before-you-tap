@@ -47,6 +47,17 @@ uvicorn app.main:app --reload --port 8080
 
 Open <http://localhost:8080>. Health check: <http://localhost:8080/healthz>.
 
+To test the layout and file upload from a phone on the same Wi-Fi network, run:
+
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+ipconfig getifaddr en0
+```
+
+On the phone, open `http://YOUR-MAC-IP:8080`, replacing `YOUR-MAC-IP` with the address printed by
+the second command. Keep the Mac awake and allow incoming connections if macOS asks. Clipboard
+access can be restricted on a local-network HTTP address; image selection and upload still work.
+
 The default configuration does not call an AI service. The recommended local setup uses Vertex AI
 with Application Default Credentials (ADC): set `GOOGLE_GENAI_USE_VERTEXAI=true` and add your
 `GOOGLE_CLOUD_PROJECT` to the local `.env`, then run `gcloud auth application-default login`.
