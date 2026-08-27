@@ -341,25 +341,6 @@ h5 {
   line-height: 1.45;
 }
 
-.upload-options {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-.paste-action {
-  flex-direction: column;
-  gap: 2px;
-  line-height: 1.2;
-}
-
-.shortcut-hint {
-  color: #555550;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
 .image-preview,
 .audio-preview {
   margin-top: 26px;
@@ -626,10 +607,6 @@ h5 {
 
   .preview-actions > *,
   .full-report .secondary-action {
-    width: 100%;
-  }
-
-  .upload-options > * {
     width: 100%;
   }
 
