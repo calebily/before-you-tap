@@ -14,8 +14,9 @@ Before You Tap accepts user-selected:
 
 The agent considers all selected pages together and returns a plain-language risk assessment, the
 warning signs it found, uncertainty, and safe next steps. Image uploads are limited to five files
-and 20 MB in total. Audio checks accept one MP3, M4A, WAV, OGG, or WebM file up to 20 MB. It does
-not monitor live calls or activate a microphone in the background.
+and 20 MB in total; they can be selected, dragged into the page, or pasted from the clipboard.
+Audio checks accept one MP3, M4A, WAV, OGG, or WebM file up to 20 MB. It does not monitor live
+calls or activate a microphone in the background.
 
 Read the approved [MVP specification](docs/MVP_SPEC.md).
 

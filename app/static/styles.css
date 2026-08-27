@@ -219,6 +219,15 @@ h5 {
   font-size: 0.9rem;
 }
 
+.paste-hint {
+  margin-top: 16px !important;
+  padding-top: 14px;
+  border-top: 2px solid #d5dceb;
+  color: #3f4d68;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .secondary-action {
   border: 2px solid #7787a6;
   background: #ffffff;

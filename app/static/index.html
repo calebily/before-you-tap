@@ -56,10 +56,19 @@
               intentionally store them.
             </p>
 
-            <label class="upload-action next-action" for="image-input" id="choose-images">
-              <span aria-hidden="true">＋</span>
-              <span>Choose one or more images</span>
-            </label>
+            <div class="drop-zone" id="image-drop-zone">
+              <p><strong>Drag image pages here</strong></p>
+              <p class="drop-zone-or">or</p>
+              <label class="upload-action next-action" for="image-input" id="choose-images">
+                <span aria-hidden="true">＋</span>
+                <span>Choose one or more images</span>
+              </label>
+              <p class="upload-hint">JPEG, PNG, or WebP · Up to 5 images · Maximum 20 MB total</p>
+              <p class="paste-hint">
+                <strong>Paste a screenshot:</strong> copy it, then press Command + V or Control + V
+                anywhere on this page.
+              </p>
+            </div>
             <input
               accept="image/jpeg,image/png,image/webp"
               class="visually-hidden"

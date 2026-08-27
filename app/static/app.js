@@ -4,6 +4,7 @@ const imagePanel = document.querySelector("#image-upload-panel");
 const audioPanel = document.querySelector("#audio-upload-panel");
 const imageTitle = document.querySelector("#image-upload-title");
 const audioTitle = document.querySelector("#audio-upload-title");
+const imageDropZone = document.querySelector("#image-drop-zone");
 const chooseImagesAction = document.querySelector("#choose-images");
 const imageInput = document.querySelector("#image-input");
 const imagePreview = document.querySelector("#image-preview");
@@ -32,6 +33,8 @@ const nextStepsList = document.querySelector("#next-steps-list");
 
 const maxImages = 5;
 const maxTotalBytes = 20 * 1024 * 1024;
+const supportedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const supportedImageExtension = /\.(jpe?g|png|webp)$/i;
 const supportedAudioTypes = new Set([
   "audio/mpeg",
   "audio/mp3",
@@ -192,6 +195,38 @@ function selectAudioFile(file) {
   return true;
 }
 
+function selectImageFiles(incomingFiles, mode) {
+  if (incomingFiles.length === 0) return false;
+
+  const hasUnsupportedImage = incomingFiles.some((file) => {
+    const hasSupportedType = supportedImageTypes.has(file.type);
+    const hasSupportedExtension = supportedImageExtension.test(file.name);
+    return !hasSupportedType && !hasSupportedExtension;
+  });
+  if (hasUnsupportedImage) {
+    showStatus("Please choose JPEG, PNG, or WebP image files only.", "error");
+    return false;
+  }
+
+  const candidateFiles = mode === "add" ? [...selectedFiles, ...incomingFiles] : incomingFiles;
+  if (candidateFiles.length > maxImages) {
+    showStatus(`Please choose no more than ${maxImages} images for one check.`, "error");
+    return false;
+  }
+
+  const totalBytes = candidateFiles.reduce((sum, file) => sum + file.size, 0);
+  if (totalBytes > maxTotalBytes) {
+    showStatus("The selected images are over the 20 MB total limit.", "error");
+    return false;
+  }
+
+  selectedFiles = candidateFiles;
+  resetStatus();
+  clearModeResult("image");
+  renderPreviews();
+  return true;
+}
+
 function moveImage(fromIndex, toIndex) {
   if (toIndex < 0 || toIndex >= selectedFiles.length) return;
   const [movedFile] = selectedFiles.splice(fromIndex, 1);
@@ -256,7 +291,6 @@ function renderPreviews() {
 
   if (selectedFiles.length === 0) {
     imagePreview.hidden = true;
-    chooseImagesAction.hidden = false;
     imageInput.value = "";
     return;
   }
@@ -271,7 +305,6 @@ function renderPreviews() {
   validateButton.textContent =
     selectedFiles.length === 1 ? "Check this image" : "Check these images";
   addImageButton.hidden = selectedFiles.length >= maxImages;
-  chooseImagesAction.hidden = true;
   imagePreview.hidden = false;
   validateButton.focus();
 }
@@ -310,32 +343,13 @@ clearImagesButton.addEventListener("click", () => {
   resetStatus();
   clearModeResult("image");
   renderPreviews();
-  chooseImagesAction.focus();
+  imageTitle.focus();
 });
 
 imageInput.addEventListener("change", () => {
   const incomingFiles = [...imageInput.files];
   if (incomingFiles.length === 0) return;
-
-  const candidateFiles =
-    selectionMode === "add" ? [...selectedFiles, ...incomingFiles] : incomingFiles;
-  if (candidateFiles.length > maxImages) {
-    showStatus(`Please choose no more than ${maxImages} images for one check.`, "error");
-    imageInput.value = "";
-    return;
-  }
-
-  const totalBytes = candidateFiles.reduce((sum, file) => sum + file.size, 0);
-  if (totalBytes > maxTotalBytes) {
-    showStatus("The selected images are over the 20 MB total limit.", "error");
-    imageInput.value = "";
-    return;
-  }
-
-  selectedFiles = candidateFiles;
-  resetStatus();
-  clearModeResult("image");
-  renderPreviews();
+  if (!selectImageFiles(incomingFiles, selectionMode)) imageInput.value = "";
 });
 
 audioInput.addEventListener("change", () => {
@@ -344,29 +358,59 @@ audioInput.addEventListener("change", () => {
   if (!selectAudioFile(file)) audioInput.value = "";
 });
 
-["dragenter", "dragover"].forEach((eventName) => {
-  audioDropZone.addEventListener(eventName, (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    audioDropZone.dataset.dragging = "true";
+function enableDropZone(dropZone, handleFiles) {
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.dataTransfer.dropEffect = "copy";
+      dropZone.dataset.dragging = "true";
+    });
   });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      delete dropZone.dataset.dragging;
+    });
+  });
+
+  dropZone.addEventListener("drop", (event) => {
+    handleFiles([...event.dataTransfer.files]);
+  });
+}
+
+enableDropZone(imageDropZone, (droppedFiles) => {
+  if (droppedFiles.length === 0) {
+    showStatus("Please drag one or more image files into this area.", "error");
+    return;
+  }
+  const mode = selectedFiles.length === 0 ? "replace" : "add";
+  selectImageFiles(droppedFiles, mode);
 });
 
-["dragleave", "drop"].forEach((eventName) => {
-  audioDropZone.addEventListener(eventName, (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    delete audioDropZone.dataset.dragging;
-  });
-});
-
-audioDropZone.addEventListener("drop", (event) => {
-  const droppedFiles = [...event.dataTransfer.files];
+enableDropZone(audioDropZone, (droppedFiles) => {
   if (droppedFiles.length !== 1) {
     showStatus("Please drag one audio file at a time.", "error");
     return;
   }
   selectAudioFile(droppedFiles[0]);
+});
+
+document.addEventListener("paste", (event) => {
+  if (activeMode !== "image") return;
+
+  const clipboardItems = event.clipboardData ? [...event.clipboardData.items] : [];
+  const pastedImages = clipboardItems
+    .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+    .map((item) => item.getAsFile())
+    .filter(Boolean);
+  if (pastedImages.length === 0) return;
+
+  event.preventDefault();
+  const mode = selectedFiles.length === 0 ? "replace" : "add";
+  selectImageFiles(pastedImages, mode);
 });
 
 changeAudioButton.addEventListener("click", () => {
