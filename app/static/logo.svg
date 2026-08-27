@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img">
+  <title>Before You Tap</title>
+  <circle cx="12.5" cy="12.5" r="9.5" fill="#171717" />
+  <path
+    d="m8.2 12.5 2.8 2.8 5.8-6"
+    fill="none"
+    stroke="#ffffff"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="2.3"
+  />
+  <path
+    d="m19.4 19.4 8 8"
+    fill="none"
+    stroke="#171717"
+    stroke-linecap="round"
+    stroke-width="3.4"
+  />
+</svg>

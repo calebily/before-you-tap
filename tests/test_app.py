@@ -13,6 +13,8 @@ def test_home_page_loads() -> None:
 
     assert response.status_code == 200
     assert "Before You Tap" in response.text
+    assert 'rel="icon" href="/static/logo.svg"' in response.text
+    assert 'class="brand-logo" src="/static/logo.svg"' in response.text
     assert "Check before you act." in response.text
     assert "Photo or screenshot" in response.text
     assert "Check an audio message" in response.text
@@ -27,6 +29,14 @@ def test_home_page_loads() -> None:
     assert "Drag an audio file here" in response.text
     assert "Remove audio" in response.text
     assert "See the full report" in response.text
+
+
+def test_logo_asset_loads() -> None:
+    response = client.get("/static/logo.svg")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/svg+xml")
+    assert "Before You Tap" in response.text
 
 
 def test_health_check_is_safe_without_cloud_credentials() -> None:
