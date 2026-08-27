@@ -11,7 +11,6 @@ const imagePreview = document.querySelector("#image-preview");
 const previewList = document.querySelector("#preview-list");
 const fileDetails = document.querySelector("#file-details");
 const validateButton = document.querySelector("#validate-upload");
-const addImageButton = document.querySelector("#add-image");
 const clearImagesButton = document.querySelector("#clear-images");
 const audioDropZone = document.querySelector("#audio-drop-zone");
 const audioInput = document.querySelector("#audio-input");
@@ -304,7 +303,6 @@ function renderPreviews() {
   fileDetails.textContent = `${selectedFiles.length} ${imageWord} · ${formatBytes(totalBytes)} total`;
   validateButton.textContent =
     selectedFiles.length === 1 ? "Check this image" : "Check these images";
-  addImageButton.hidden = selectedFiles.length >= maxImages;
   imagePreview.hidden = false;
   validateButton.focus();
 }
@@ -329,13 +327,8 @@ buttons.forEach((button) => {
 });
 
 chooseImagesAction.addEventListener("click", () => {
-  selectionMode = "replace";
-});
-
-addImageButton.addEventListener("click", () => {
-  selectionMode = "add";
+  selectionMode = selectedFiles.length === 0 ? "replace" : "add";
   imageInput.value = "";
-  imageInput.click();
 });
 
 clearImagesButton.addEventListener("click", () => {
@@ -433,7 +426,6 @@ validateButton.addEventListener("click", async () => {
   }
 
   validateButton.disabled = true;
-  addImageButton.disabled = true;
   clearImagesButton.disabled = true;
   validateButton.textContent = "Checking for warning signs…";
   resetStatus();
@@ -461,7 +453,6 @@ validateButton.addEventListener("click", async () => {
     showStatus(error.message, "error");
   } finally {
     validateButton.disabled = false;
-    addImageButton.disabled = false;
     clearImagesButton.disabled = false;
     validateButton.textContent =
       selectedFiles.length === 1 ? "Check this image" : "Check these images";

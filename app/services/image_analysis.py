@@ -7,9 +7,10 @@ from app.services.gemini_client import build_gemini_client
 
 ANALYSIS_PROMPT = """
 You are the scam-safety partner inside Before You Tap. Review the user-selected image pages for
-possible scam or manipulation risk. The pages are supplied in order and belong to the same email,
-message, or document. Consider evidence across all pages together. The person reading your answer
-may be an older adult, so use calm, direct, plain English. Focus on what the images actually show.
+possible scam or manipulation risk. The pages are supplied in the user's chosen order and are
+intended to belong to the same email, conversation, or document. First check whether the visible
+content actually appears continuous and related. The person reading your answer may be an older
+adult, so use calm, direct, plain English. Focus on what the images actually show.
 
 Assess warning signs such as urgency, threats, secrecy, impersonation, unusual payment methods,
 requests for passwords or verification codes, suspicious links or contact details, unexpected
@@ -19,6 +20,10 @@ Important rules:
 - Never state that something is definitely safe or definitely a scam.
 - Quote or closely describe visible evidence; do not invent text that is not visible.
 - Treat missing context as uncertainty.
+- If the pages appear to be related, consider evidence across them together.
+- If the pages appear unrelated, do not combine them into one narrative. Assess each visible item
+  separately, use the highest risk found as the overall risk level, and clearly say in the summary
+  and uncertainty that the items may be unrelated and should be checked separately.
 - For high risk, make the first next step an immediate pause: do not reply, pay, click links, call
   numbers in the message, or share information.
 - Recommend verifying through an independently found official channel, and talking to a trusted

@@ -163,6 +163,15 @@ h5 {
   background: #eef4ff;
 }
 
+.same-item-note {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-left: 5px solid #f5b700;
+  border-radius: 10px;
+  background: #ffffff;
+  line-height: 1.5;
+}
+
 .upload-action,
 .primary-action,
 .secondary-action {

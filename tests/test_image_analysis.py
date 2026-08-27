@@ -41,4 +41,6 @@ def test_builds_a_structured_multimodal_gemini_request(monkeypatch) -> None:
     assert len(calls["contents"]) == 5
     assert calls["contents"][1] == "Page 1 of 2:"
     assert calls["contents"][3] == "Page 2 of 2:"
+    assert "do not combine them into one narrative" in calls["contents"][0]
+    assert "use the highest risk found" in calls["contents"][0]
     assert calls["config"].response_mime_type == "application/json"
