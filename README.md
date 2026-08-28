@@ -3,7 +3,7 @@
 An AI safety companion that helps older adults analyse suspicious images and audio messages before they act.
 
 > Status: multi-image and saved-audio selection, secure upload validation, Gemini risk analysis,
-> and a mobile-first accessible results view are working.
+> guided follow-up actions, and a mobile-first accessible results view are working.
 
 ## MVP
 
@@ -13,7 +13,9 @@ Before You Tap accepts user-selected:
 - existing audio files such as voicemails and voice messages.
 
 The agent considers all selected pages together and returns a plain-language risk assessment, the
-warning signs it found, uncertainty, and safe next steps. Image uploads are limited to five files
+warning signs it found, uncertainty, and safe next steps. It then offers a small set of controlled,
+context-relevant follow-up actions. A follow-up request sends only the structured assessment and
+the selected action to Gemini; it does not resend the original image or audio. Image uploads are limited to five files
 and 20 MB in total; they can be selected, captured with a phone camera, dragged into the page,
 or pasted from the clipboard.
 The UI asks users to keep unrelated emails or conversations in separate checks. If unrelated
@@ -77,6 +79,23 @@ pytest
 - Demo and test assets must be fictional and non-sensitive.
 - Uploaded content is processed in memory for the current analysis and is not intentionally retained by the app.
 - The UI must clearly disclose cloud-AI processing before a user uploads a file.
+- Uploaded media is restricted by count, size, declared MIME type, and file signature.
+- API responses use `Cache-Control: no-store`; browser security headers include a restrictive
+  Content Security Policy, clickjacking protection, MIME-sniffing protection, and a minimal
+  Permissions Policy.
+- Cross-origin browser requests to state-changing API routes are rejected. This reduces drive-by
+  use of the public, billable analysis endpoints but is not a replacement for infrastructure-level
+  rate limiting.
+- Gemini-generated text is inserted into the page as text, not executable HTML.
+
+For the public hackathon service, keep Cloud Run's maximum instance count low as a cost safeguard.
+Google recommends starting with three instances for a small service:
+
+```bash
+gcloud run services update before-you-tap \
+  --region australia-southeast1 \
+  --max-instances 3
+```
 
 ## Repository layout
 
