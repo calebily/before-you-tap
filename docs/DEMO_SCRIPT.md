@@ -42,7 +42,7 @@ first safe next step. Keep the Cloud Run domain visible.
 **Narration:**
 
 > This is Before You Tap. It turns a suspicious message into a clear risk warning and the next safe
-> action, before someone clicks, calls back, pays, or shares private information.
+> step, before someone clicks, calls back, pays, or shares private information.
 
 ### 0:12–0:38 — Problem and value
 
@@ -51,10 +51,11 @@ mobile-first controls.
 
 **Narration:**
 
-> Hi, I’m Lily. Scam messages often work by creating urgency before a person has time to verify
-> what they are being told. For many older adults, existing security warnings are technical or too
-> vague to act on. Before You Tap is a calm, multimodal safety companion that explains the evidence
-> in plain English and guides the user one step at a time.
+> Hi, I’m Lily. I built this because scam messages usually do not give people much time to think.
+> They say an account will be locked, a parcel is waiting, or someone needs money urgently. That
+> pressure can be especially difficult for older adults, and a warning that only says “be careful”
+> is not very useful. I wanted the app to show what looks suspicious and give the user a clear next
+> step.
 
 ### 0:38–1:08 — Begin a real multi-image check
 
@@ -64,9 +65,10 @@ images**. Cut only the waiting time.
 
 **Narration:**
 
-> This is the live application running on Google Cloud Run. I’ll upload two screenshots from one
-> fictional bank message. Before sending anything to the model, the backend checks the file count,
-> total size, MIME type, and file signature. The pages remain in the user’s chosen reading order.
+> This is the real app running on Google Cloud Run. I’m using two fictional screenshots from the
+> same bank message. The user can check the pages and put them in the right order. Before the files
+> reach Gemini, the backend checks that they are valid images and checks the file count and total
+> size.
 
 ### 1:08–1:50 — Show autonomous analysis
 
@@ -75,11 +77,10 @@ next steps. Expand **See the full report** briefly.
 
 **Narration:**
 
-> Gemini 3.5 Flash reads both pages together. The agent identifies the account-lock threat, the
-> request for a verification code, the so-called safety-account transfer, and the instruction to
-> keep the request secret. It separates observed evidence from uncertainty, returns a structured
-> High risk result, and places the safest immediate action first. It never claims that a message is
-> definitely safe or definitely fraudulent.
+> Gemini 3.5 Flash reads both pages together. Here, it notices the threat to lock the account, the
+> request for a security code, the transfer to a so-called safety account, and the instruction not
+> to tell anyone. It explains each warning sign, shows what it cannot confirm, and puts the most
+> important action at the top. It does not pretend that it can prove who sent the message.
 
 ### 1:50–2:25 — Show the guided follow-up workflow
 
@@ -88,10 +89,10 @@ result and its ordered protective steps.
 
 **Narration:**
 
-> This is more than a one-off warning. Based on the evidence, the agent chooses only relevant
-> follow-up options. If the user says they already clicked the link, it changes the guidance to the
-> next safest actions without blaming them. For data minimisation, the follow-up sends only the
-> structured assessment and the selected action. The original screenshots are not sent again.
+> The app does not stop after showing a risk level. It asks what has already happened and only shows
+> choices that make sense for this message. If I choose “I clicked the link,” the instructions
+> change to what I should do now. The original screenshots are not sent again for this follow-up;
+> only the result and the answer I selected are used.
 
 ### 2:25–2:55 — Prove saved-audio support
 
@@ -100,9 +101,10 @@ two seconds, then show its completed result. Cut the model waiting time.
 
 **Narration:**
 
-> The same workflow also accepts a saved voicemail or voice message. It does not listen to live
-> calls and never turns on the microphone in the background. Here, Gemini detects an unverified
-> caller, urgency, and a suspicious callback request, then returns a cautious next step.
+> The app can also check a saved voicemail or voice message. It does not listen to live calls and
+> it does not turn on the microphone in the background. In this example, the caller creates
+> urgency and asks the user to call an unverified number, so the app tells them to check through an
+> official source instead.
 
 ### 2:55–3:25 — Architecture and production proof
 
@@ -111,10 +113,10 @@ long enough to read `gemini-3.5-flash`, `vertex_ai`, and the configured booleans
 
 **Narration:**
 
-> The application uses the Google GenAI SDK for Python, Gemini 3.5 Flash on Vertex AI, FastAPI, and
-> Cloud Run. Uploaded media is processed in memory and is not intentionally retained. Model output
-> must pass a strict response schema before the interface displays it, and no API key is exposed in
-> the browser.
+> Behind the app, I use the Google Gen AI SDK for Python, Gemini 3.5 Flash on Vertex AI, FastAPI,
+> and Cloud Run. The uploaded files are handled in memory and are not intentionally stored. The
+> model has to return the result in a fixed structure before the website can display it, and there
+> is no API key in the browser.
 
 ### 3:25–3:45 — Close
 
@@ -123,8 +125,8 @@ Low concern.
 
 **Narration:**
 
-> Before You Tap does not replace a bank or fraud investigator. It creates a calm pause at the
-> moment pressure is highest, explains what stood out, and helps a person take the next safer step.
+> Before You Tap cannot prove that every message is safe or fake. My goal is simpler: when someone
+> is being rushed, give them a moment to check what is happening before they do anything.
 
 ## Editing rules
 
