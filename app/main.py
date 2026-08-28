@@ -7,7 +7,14 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.schemas import AnalysisResult, HealthResponse, MediaKind, UploadValidationResponse
+from app.schemas import (
+    AnalysisResult,
+    FollowUpRequest,
+    FollowUpResult,
+    HealthResponse,
+    MediaKind,
+    UploadValidationResponse,
+)
 from app.services.audio_analysis import AudioAnalysisError, analyse_audio
 from app.services.file_validation import (
     FileValidationError,
@@ -15,6 +22,7 @@ from app.services.file_validation import (
     validate_upload,
 )
 from app.services.gemini_client import GeminiConfigurationError
+from app.services.follow_up import FollowUpAnalysisError, analyse_follow_up
 from app.services.image_analysis import ImageAnalysisError, analyse_images
 
 APP_DIR = Path(__file__).resolve().parent
@@ -186,3 +194,25 @@ async def analyse_selected_audio(
         ) from exc
     finally:
         await file.close()
+
+
+@app.post("/api/follow-up", response_model=FollowUpResult)
+async def guided_follow_up(request: FollowUpRequest) -> FollowUpResult:
+    settings = get_settings()
+
+    try:
+        return await run_in_threadpool(
+            analyse_follow_up,
+            request=request,
+            settings=settings,
+        )
+    except GeminiConfigurationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The AI check is not configured yet. Please try again after setup is complete.",
+        ) from exc
+    except FollowUpAnalysisError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="We could not prepare the next steps just now. Please try again in a moment.",
+        ) from exc
