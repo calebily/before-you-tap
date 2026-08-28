@@ -268,6 +268,28 @@ h5 {
   padding: 13px 18px;
 }
 
+.upload-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.camera-action {
+  display: none;
+}
+
+.upload-icon,
+.upload-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.upload-icon svg {
+  fill: currentColor;
+}
+
 .upload-action,
 .primary-action {
   border: 2px solid #2357b8;
@@ -619,6 +641,31 @@ h5 {
 
   .preview-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .upload-options {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .upload-options .upload-action {
+    width: 100%;
+  }
+
+  .camera-action {
+    display: inline-flex;
+  }
+
+  .device-action {
+    border-color: #222220;
+    background: #ffffff;
+    color: #171717;
+  }
+
+  .device-action:hover {
+    background: #f4f4f1;
   }
 }
 
