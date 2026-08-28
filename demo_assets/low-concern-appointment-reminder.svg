@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Fictional Brightside Dental appointment reminder</title>
+  <desc id="desc">A calm fictional appointment reminder that asks for no payment, password, code, or personal information.</desc>
+  <rect width="900" height="1200" fill="#f3f5f8"/>
+  <rect x="65" y="70" width="770" height="1060" rx="28" fill="#ffffff" stroke="#d7dce3" stroke-width="3"/>
+  <circle cx="145" cy="155" r="42" fill="#dbeafe"/>
+  <path d="M130 133 C118 144 122 177 145 190 C168 177 172 144 160 133 C152 126 150 141 145 141 C140 141 138 126 130 133 Z" fill="#2458c6"/>
+  <text x="215" y="150" font-family="Arial, sans-serif" font-size="36" font-weight="700" fill="#111827">Brightside Dental</text>
+  <text x="215" y="187" font-family="Arial, sans-serif" font-size="20" fill="#6b7280">Fictional appointment reminder</text>
+  <line x1="115" y1="245" x2="785" y2="245" stroke="#e5e7eb" stroke-width="2"/>
+
+  <text x="115" y="330" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#111827">Your appointment is coming up</text>
+  <text x="115" y="410" font-family="Arial, sans-serif" font-size="27" fill="#1f2937">Hi Alex,</text>
+  <text x="115" y="470" font-family="Arial, sans-serif" font-size="27" fill="#1f2937">This is a reminder for your routine check-up.</text>
+
+  <rect x="115" y="535" width="670" height="190" rx="18" fill="#eff6ff"/>
+  <text x="155" y="595" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#2458c6">DATE AND TIME</text>
+  <text x="155" y="652" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#111827">Thursday, 30 August · 10:30 AM</text>
+  <text x="155" y="696" font-family="Arial, sans-serif" font-size="23" fill="#4b5563">Routine dental check-up</text>
+
+  <text x="115" y="805" font-family="Arial, sans-serif" font-size="26" fill="#1f2937">No action is needed if you can attend.</text>
+  <text x="115" y="860" font-family="Arial, sans-serif" font-size="24" fill="#4b5563">To reschedule, use the contact details from your</text>
+  <text x="115" y="900" font-family="Arial, sans-serif" font-size="24" fill="#4b5563">original booking confirmation or our official website.</text>
+  <text x="115" y="970" font-family="Arial, sans-serif" font-size="22" fill="#6b7280">This reminder does not request payment, passwords,</text>
+  <text x="115" y="1006" font-family="Arial, sans-serif" font-size="22" fill="#6b7280">verification codes, or personal information.</text>
+
+  <text x="450" y="1080" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6b7280">Fictional demonstration message</text>
+</svg>
