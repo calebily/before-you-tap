@@ -68,10 +68,22 @@
           <div class="drop-zone" id="image-drop-zone">
             <p><strong>Drag image pages here</strong></p>
             <p class="desktop-hint">or choose one from your device</p>
-            <button class="upload-action" id="choose-images" type="button">
-              <span aria-hidden="true">＋</span>
-              <span>Choose one or more images</span>
-            </button>
+            <div class="upload-options">
+              <button class="upload-action camera-action" id="take-photo" type="button">
+                <span class="upload-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path
+                      d="M8.5 6.5 10 4.5h4l1.5 2H19a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2h3.5ZM12 16.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-2a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"
+                    />
+                  </svg>
+                </span>
+                <span>Take a photo</span>
+              </button>
+              <button class="upload-action device-action" id="choose-images" type="button">
+                <span aria-hidden="true">＋</span>
+                <span>Choose one or more images</span>
+              </button>
+            </div>
             <p class="upload-hint">
               JPEG, PNG, or WebP · Up to 5 images · 20 MB total<br />
               Paste a screenshot: ⌘V on Mac · Ctrl+V on Windows
@@ -83,6 +95,14 @@
             id="image-input"
             multiple
             name="files"
+            type="file"
+          />
+          <input
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            class="visually-hidden"
+            id="camera-input"
+            name="camera-file"
             type="file"
           />
 

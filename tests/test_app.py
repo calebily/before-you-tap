@@ -20,6 +20,9 @@ def test_home_page_loads() -> None:
     assert "Check an audio message" in response.text
     assert "Listen" in response.text
     assert "Drag image pages here" in response.text
+    assert "Take a photo" in response.text
+    assert 'id="camera-input"' in response.text
+    assert 'capture="environment"' in response.text
     assert "Paste a screenshot" in response.text
     assert "⌘V on Mac" in response.text
     assert "Ctrl+V on Windows" in response.text

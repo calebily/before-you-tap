@@ -14,7 +14,8 @@ Before You Tap accepts user-selected:
 
 The agent considers all selected pages together and returns a plain-language risk assessment, the
 warning signs it found, uncertainty, and safe next steps. Image uploads are limited to five files
-and 20 MB in total; they can be selected, dragged into the page, or pasted from the clipboard.
+and 20 MB in total; they can be selected, captured with a phone camera, dragged into the page,
+or pasted from the clipboard.
 The UI asks users to keep unrelated emails or conversations in separate checks. If unrelated
 items are supplied accidentally, the model is instructed not to combine them into one narrative.
 Audio checks accept one MP3, M4A, WAV, OGG, or WebM file up to 20 MB. It does not monitor live
@@ -45,7 +46,7 @@ cp .env.example .env
 uvicorn app.main:app --reload --port 8080
 ```
 
-Open <http://localhost:8080>. Health check: <http://localhost:8080/healthz>.
+Open <http://localhost:8080>. Health check: <http://localhost:8080/api/health>.
 
 To test the layout and file upload from a phone on the same Wi-Fi network, run:
 
