@@ -1,7 +1,7 @@
 from pathlib import Path, PurePath
 from typing import Annotated
 
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
+from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -14,6 +14,13 @@ from app.schemas import (
     HealthResponse,
     MediaKind,
     UploadValidationResponse,
+)
+from app.security import (
+    cross_origin_error,
+    is_cross_origin_api_request,
+    is_oversized_api_request,
+    request_too_large_error,
+    secure_response,
 )
 from app.services.audio_analysis import AudioAnalysisError, analyse_audio
 from app.services.file_validation import (
@@ -35,6 +42,17 @@ app = FastAPI(
     description="Scam-safety companion for suspicious images and audio messages.",
 )
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.middleware("http")
+async def browser_security_controls(request: Request, call_next) -> Response:
+    if is_cross_origin_api_request(request):
+        return cross_origin_error()
+    if is_oversized_api_request(request, max_upload_bytes=get_settings().max_upload_bytes):
+        return request_too_large_error()
+
+    response = await call_next(request)
+    return secure_response(response, api_response=request.url.path.startswith("/api/"))
 
 
 @app.get("/", include_in_schema=False)
