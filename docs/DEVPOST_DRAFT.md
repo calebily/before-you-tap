@@ -6,7 +6,7 @@ Before You Tap
 
 ## Tagline
 
-A calm, multimodal scam-safety companion that helps older adults check before they act.
+A simple way to check suspicious messages and voice notes before responding, paying, or sharing details.
 
 ## Category
 
@@ -24,7 +24,7 @@ unverified number, share a verification code, or move money before they have tim
 they trust.
 
 Existing warnings are often technical, alarmist, or too vague to be useful. I wanted to build a
-calm second opinion for older adults: something that does not shame the user, does not pretend to
+clear guidance for older adults: something that does not shame the user, does not pretend to
 offer certainty, and turns suspicious content into a small number of safe, understandable actions.
 
 ## What it does
