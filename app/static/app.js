@@ -8,8 +8,10 @@ const audioPanel = document.querySelector("#audio-upload-panel");
 const imageTitle = document.querySelector("#image-upload-title");
 const audioTitle = document.querySelector("#audio-upload-title");
 const imageDropZone = document.querySelector("#image-drop-zone");
+const takePhotoAction = document.querySelector("#take-photo");
 const chooseImagesAction = document.querySelector("#choose-images");
 const imageInput = document.querySelector("#image-input");
+const cameraInput = document.querySelector("#camera-input");
 const imagePreview = document.querySelector("#image-preview");
 const previewList = document.querySelector("#preview-list");
 const fileDetails = document.querySelector("#file-details");
@@ -411,6 +413,11 @@ chooseImagesAction.addEventListener("click", () => {
   imageInput.click();
 });
 
+takePhotoAction.addEventListener("click", () => {
+  cameraInput.value = "";
+  cameraInput.click();
+});
+
 chooseAudioAction.addEventListener("click", () => {
   audioInput.value = "";
   audioInput.click();
@@ -428,6 +435,13 @@ imageInput.addEventListener("change", () => {
   const incomingFiles = [...imageInput.files];
   if (incomingFiles.length === 0) return;
   if (!selectImageFiles(incomingFiles, selectionMode)) imageInput.value = "";
+});
+
+cameraInput.addEventListener("change", () => {
+  const [photo] = cameraInput.files;
+  if (!photo) return;
+  const mode = selectedFiles.length === 0 ? "replace" : "add";
+  if (!selectImageFiles([photo], mode)) cameraInput.value = "";
 });
 
 audioInput.addEventListener("change", () => {
