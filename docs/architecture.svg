@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Before You Tap system architecture</title>
+  <desc id="desc">A browser sends selected images or audio to FastAPI on Cloud Run. Validated media is analysed by Gemini 3.5 Flash on Vertex AI through the Google GenAI SDK. A structured result returns to the browser. Guided follow-up resends only the assessment and selected action.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2458c6"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#111827" flood-opacity="0.08"/>
+    </filter>
+    <style>
+      .title { font: 700 34px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 400 17px Arial, sans-serif; fill: #4b5563; }
+      .label { font: 700 19px Arial, sans-serif; fill: #111827; }
+      .body { font: 400 15px Arial, sans-serif; fill: #4b5563; }
+      .small { font: 600 13px Arial, sans-serif; fill: #2458c6; }
+      .box { fill: #ffffff; stroke: #111827; stroke-width: 2; rx: 18; filter: url(#shadow); }
+      .cloud { fill: #edf3ff; stroke: #2458c6; stroke-width: 2.5; rx: 24; }
+      .arrow { stroke: #2458c6; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .return { stroke: #6b7280; stroke-width: 2.5; stroke-dasharray: 8 7; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="800" fill="#f7f8fb"/>
+  <text class="title" x="600" y="58" text-anchor="middle">Before You Tap — System Architecture</text>
+  <text class="subtitle" x="600" y="88" text-anchor="middle">Multimodal scam-safety workflow with transient session state</text>
+
+  <rect class="box" x="55" y="200" width="230" height="170"/>
+  <circle cx="100" cy="245" r="21" fill="#111827"/>
+  <rect x="90" y="232" width="20" height="26" rx="3" fill="none" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="85" y="300">Phone or desktop</text>
+  <text class="body" x="85" y="330">Accessible web UI</text>
+  <text class="body" x="85" y="352">Transient browser state</text>
+
+  <rect class="cloud" x="365" y="130" width="470" height="420"/>
+  <text class="small" x="400" y="170">GOOGLE CLOUD — CLOUD RUN</text>
+
+  <rect class="box" x="410" y="195" width="380" height="120"/>
+  <text class="label" x="440" y="238">FastAPI application</text>
+  <text class="body" x="440" y="267">Security middleware and API routes</text>
+  <text class="body" x="440" y="289">No database or long-term memory</text>
+
+  <rect class="box" x="410" y="365" width="380" height="125"/>
+  <text class="label" x="440" y="407">Validation and orchestration</text>
+  <text class="body" x="440" y="436">File signature, MIME, size and count checks</text>
+  <text class="body" x="440" y="460">Google GenAI SDK + typed response schemas</text>
+
+  <rect class="box" x="915" y="200" width="230" height="170"/>
+  <circle cx="960" cy="245" r="21" fill="#2458c6"/>
+  <path d="M950 248 L960 232 L970 248 L960 259 Z" fill="#ffffff"/>
+  <text class="label" x="945" y="300">Vertex AI</text>
+  <text class="body" x="945" y="330">Gemini 3.5 Flash</text>
+  <text class="body" x="945" y="352">Multimodal reasoning</text>
+
+  <path class="arrow" d="M285 270 H397"/>
+  <text class="small" x="340" y="242" text-anchor="middle">media</text>
+
+  <path class="arrow" d="M600 315 V353"/>
+  <path class="arrow" d="M790 427 H850 L902 285"/>
+  <text class="small" x="865" y="390" text-anchor="middle">validated</text>
+
+  <path class="return" d="M1030 382 V600 H170 V382"/>
+  <text class="small" x="600" y="630" text-anchor="middle">structured risk result and safe next actions</text>
+
+  <rect x="185" y="660" width="830" height="86" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text class="label" x="220" y="696">Guided follow-up minimises data</text>
+  <text class="body" x="220" y="724">Only the structured assessment and the user-selected action return to Cloud Run; original media is not resent.</text>
+</svg>
