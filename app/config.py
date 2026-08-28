@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     google_genai_use_vertexai: bool = False
     google_api_key: SecretStr | None = None
     gemini_model: str = "gemini-3.5-flash"
-    max_upload_mb: int = 20
+    max_upload_mb: int = Field(default=20, ge=1, le=20)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
