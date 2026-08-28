@@ -31,7 +31,9 @@ The MVP does **not** listen to live calls, activate the microphone in the backgr
    - the specific warning signs found and where they appeared;
    - uncertainty or missing evidence;
    - two or three safe next steps.
-6. The user may ask a follow-up question. The agent keeps the current analysis in session and guides the user without making them start again.
+6. The agent offers a small set of context-relevant follow-up actions. The user selects what they
+   have already done, and the agent keeps the current structured assessment in the browser session
+   to guide them without making them start again.
 
 ## 4. Agent behaviour and safety contract
 
@@ -55,10 +57,10 @@ The MVP does **not** listen to live calls, activate the microphone in the backgr
 ## 6. Technical scope
 
 - **Interface:** Responsive web app with image capture/upload and audio-file upload.
-- **Backend:** Python, FastAPI, and Google Agent Development Kit (ADK).
+- **Backend:** Python, FastAPI, and the Google GenAI SDK.
 - **Model:** Gemini 3.5 Flash multimodal through Vertex AI for image/audio understanding and risk reasoning.
 - **Google Cloud:** Cloud Run for deployment and visible proof of the cloud backend.
-- **Session state:** In-memory state initially; Firestore only if needed for reliable multi-turn sessions.
+- **Session state:** Transient browser-session state; no database or long-term memory in the MVP.
 - **Security:** Validate file type and size; keep secrets out of the frontend and repository; use environment variables or managed cloud configuration for credentials.
 
 ## 7. MVP acceptance criteria
@@ -68,7 +70,7 @@ The MVP is complete when a judge can:
 1. Upload one or more ordered images from the same suspicious content and receive a combined evidence-based risk assessment with safe next steps.
 2. Upload a suspicious voicemail or voice message and receive the same structured assessment.
 3. See a helpful clarification request for an unreadable image or unclear audio file rather than a fabricated result.
-4. Ask a follow-up question that uses the current session context.
+4. Select a guided follow-up action that uses the current structured assessment.
 5. Use the interface on desktop and mobile with accessible controls.
 6. See the working backend deployed on Cloud Run in the demo video.
 
