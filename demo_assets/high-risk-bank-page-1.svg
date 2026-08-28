@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Fictional Harbourline Bank security alert, page one</title>
+  <desc id="desc">A fictional message uses urgency, a suspicious domain, an account-lock threat, and a verification button.</desc>
+  <rect width="900" height="1200" fill="#f3f5f8"/>
+  <rect x="65" y="55" width="770" height="1090" rx="24" fill="#ffffff" stroke="#d7dce3" stroke-width="3"/>
+  <rect x="65" y="55" width="770" height="145" rx="24" fill="#12315b"/>
+  <rect x="65" y="175" width="770" height="25" fill="#12315b"/>
+  <circle cx="145" cy="125" r="38" fill="#ffffff"/>
+  <path d="M125 151 V100 L145 85 L165 100 V151 H151 V125 H139 V151 Z" fill="#12315b"/>
+  <text x="210" y="120" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#ffffff">HARBOURLINE BANK</text>
+  <text x="210" y="158" font-family="Arial, sans-serif" font-size="20" fill="#dce8f8">Account security notice</text>
+
+  <text x="115" y="265" font-family="Arial, sans-serif" font-size="20" fill="#6b7280">From: alerts@harbourline-security.example</text>
+  <line x1="115" y1="295" x2="785" y2="295" stroke="#e5e7eb" stroke-width="2"/>
+  <text x="115" y="375" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#111827">Unusual transfer detected</text>
+
+  <text x="115" y="455" font-family="Arial, sans-serif" font-size="27" fill="#1f2937">Dear customer,</text>
+  <text x="115" y="515" font-family="Arial, sans-serif" font-size="27" fill="#1f2937">We detected a transfer of $1,280.00 from your</text>
+  <text x="115" y="557" font-family="Arial, sans-serif" font-size="27" fill="#1f2937">account. Your account will be locked in</text>
+  <text x="115" y="599" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#b42318">30 minutes unless you verify this activity.</text>
+
+  <rect x="115" y="675" width="670" height="96" rx="14" fill="#b42318"/>
+  <text x="450" y="735" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#ffffff">VERIFY ACTIVITY NOW</text>
+
+  <rect x="115" y="830" width="670" height="170" rx="16" fill="#fff7ed" stroke="#f3b562" stroke-width="2"/>
+  <text x="145" y="885" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#8a3b12">Important security instruction</text>
+  <text x="145" y="935" font-family="Arial, sans-serif" font-size="23" fill="#1f2937">Do not call your local branch while verification</text>
+  <text x="145" y="974" font-family="Arial, sans-serif" font-size="23" fill="#1f2937">is in progress. Continue to page 2.</text>
+
+  <text x="450" y="1090" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6b7280">Fictional demonstration message · Page 1 of 2</text>
+</svg>
