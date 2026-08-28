@@ -28,6 +28,11 @@ Important rules:
   numbers in the message, or share information.
 - Recommend verifying through an independently found official channel, and talking to a trusted
   person when appropriate.
+- Choose follow_up_options only from the allowed enum values. Always include nothing_yet and
+  still_unsure. Add clicked_link only when a link or button is visible; replied_or_called when a
+  reply, call, or continued contact is relevant; shared_private_information when personal,
+  account, password, code, or identity information is requested; and sent_money when payment or a
+  transfer is requested. Return no more than five options.
 - Do not provide legal or financial advice.
 - Return only the requested structured result.
 """.strip()

@@ -37,6 +37,15 @@ const warningList = document.querySelector("#warning-list");
 const uncertaintySection = document.querySelector("#uncertainty-section");
 const uncertaintyList = document.querySelector("#uncertainty-list");
 const nextStepsList = document.querySelector("#next-steps-list");
+const followUpQuestion = document.querySelector("#follow-up-question");
+const followUpOptions = document.querySelector("#follow-up-options");
+const followUpStatus = document.querySelector("#follow-up-status");
+const followUpResult = document.querySelector("#follow-up-result");
+const followUpResultTitle = document.querySelector("#follow-up-result-title");
+const followUpReassurance = document.querySelector("#follow-up-reassurance");
+const followUpSteps = document.querySelector("#follow-up-steps");
+const urgentNote = document.querySelector("#urgent-note");
+const changeFollowUpButton = document.querySelector("#change-follow-up");
 const fullReportToggle = document.querySelector("#full-report-toggle");
 const fullReport = document.querySelector("#full-report");
 const hideFullReportButton = document.querySelector("#hide-full-report");
@@ -65,6 +74,16 @@ let audioPreviewUrl = null;
 let activeMode = null;
 let readAloudEnabled = false;
 const resultsByMode = { image: null, audio: null };
+const followUpsByMode = { image: null, audio: null };
+
+const followUpCopy = {
+  nothing_yet: "I have not done anything yet",
+  clicked_link: "I clicked the link",
+  replied_or_called: "I replied or called them",
+  shared_private_information: "I shared private information",
+  sent_money: "I sent money",
+  still_unsure: "I am still unsure",
+};
 
 function stopSpeaking() {
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -81,6 +100,7 @@ function speakText(text) {
 
 function currentReadingText() {
   if (!analysisResult.hidden) {
+    if (!followUpResult.hidden) return followUpResult.innerText;
     if (!fullReport.hidden) return fullReport.innerText;
     return `${riskBadge.innerText}. ${resultTitle.innerText}. ${resultSummary.innerText}. ${nextSteps.innerText}`;
   }
@@ -130,6 +150,16 @@ function clearRenderedResult() {
   warningList.replaceChildren();
   uncertaintyList.replaceChildren();
   nextStepsList.replaceChildren();
+  followUpOptions.replaceChildren();
+  followUpQuestion.hidden = true;
+  followUpStatus.hidden = true;
+  followUpStatus.textContent = "";
+  followUpResult.hidden = true;
+  followUpResultTitle.textContent = "";
+  followUpReassurance.textContent = "";
+  followUpSteps.replaceChildren();
+  urgentNote.hidden = true;
+  urgentNote.textContent = "";
   warningSection.hidden = true;
   uncertaintySection.hidden = true;
   fullReport.hidden = true;
@@ -139,6 +169,7 @@ function clearRenderedResult() {
 
 function clearModeResult(mode) {
   resultsByMode[mode] = null;
+  followUpsByMode[mode] = null;
   if (activeMode === mode) clearRenderedResult();
 }
 
@@ -148,6 +179,81 @@ function appendTextList(container, items) {
     listItem.textContent = item;
     container.append(listItem);
   });
+}
+
+function setFollowUpButtonsDisabled(disabled) {
+  [...followUpOptions.querySelectorAll("button")].forEach((button) => {
+    button.disabled = disabled;
+  });
+}
+
+function renderFollowUpResult(payload, { focus = true } = {}) {
+  followUpResultTitle.textContent = payload.heading;
+  followUpReassurance.textContent = payload.reassurance;
+  followUpSteps.replaceChildren();
+  appendTextList(followUpSteps, payload.next_steps);
+  urgentNote.textContent = payload.urgent_note || "";
+  urgentNote.hidden = !payload.urgent_note;
+  followUpResult.hidden = false;
+  if (focus) {
+    followUpResult.focus({ preventScroll: true });
+    followUpResult.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  speakText(followUpResult.innerText);
+}
+
+async function requestFollowUp(action) {
+  const requestMode = activeMode;
+  const analysis = resultsByMode[requestMode];
+  if (!analysis) return;
+
+  setFollowUpButtonsDisabled(true);
+  followUpStatus.textContent = "Preparing the safest next steps…";
+  followUpStatus.hidden = false;
+  delete followUpStatus.dataset.state;
+  followUpResult.hidden = true;
+
+  try {
+    const response = await fetch("/api/follow-up", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, analysis }),
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.detail || "The next steps could not be prepared.");
+    }
+
+    followUpsByMode[requestMode] = payload;
+    if (activeMode === requestMode) {
+      followUpStatus.hidden = true;
+      renderFollowUpResult(payload);
+    }
+  } catch (error) {
+    if (activeMode === requestMode) {
+      followUpStatus.textContent = error.message;
+      followUpStatus.dataset.state = "error";
+    }
+  } finally {
+    setFollowUpButtonsDisabled(false);
+  }
+}
+
+function renderFollowUpOptions(actions) {
+  followUpOptions.replaceChildren();
+  const supportedActions = [...new Set(actions || [])].filter((action) => followUpCopy[action]);
+  const visibleActions =
+    supportedActions.length > 0 ? supportedActions : ["nothing_yet", "still_unsure"];
+
+  visibleActions.forEach((action) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "follow-up-button";
+    button.textContent = followUpCopy[action];
+    button.addEventListener("click", () => requestFollowUp(action));
+    followUpOptions.append(button);
+  });
+  followUpQuestion.hidden = false;
 }
 
 function renderResult(payload, { focus = true } = {}) {
@@ -193,6 +299,7 @@ function renderResult(payload, { focus = true } = {}) {
   }
 
   appendTextList(nextStepsList, payload.safe_next_steps);
+  renderFollowUpOptions(payload.follow_up_options);
   analysisResult.hidden = false;
   if (focus) analysisResult.focus();
   speakText(`${risk.label}. ${risk.title} ${payload.summary}. ${nextSteps.innerText}`);
@@ -200,6 +307,7 @@ function renderResult(payload, { focus = true } = {}) {
 
 function saveResult(payload, mode) {
   resultsByMode[mode] = payload;
+  followUpsByMode[mode] = null;
   if (activeMode === mode) renderResult(payload);
 }
 
@@ -381,7 +489,11 @@ buttons.forEach((button) => {
     resetStatus();
     clearRenderedResult();
     const savedResult = resultsByMode[activeMode];
-    if (savedResult) renderResult(savedResult, { focus: false });
+    if (savedResult) {
+      renderResult(savedResult, { focus: false });
+      const savedFollowUp = followUpsByMode[activeMode];
+      if (savedFollowUp) renderFollowUpResult(savedFollowUp, { focus: false });
+    }
     const activeTitle = isImage ? imageTitle : audioTitle;
     activeTitle.focus({ preventScroll: true });
     selection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -405,6 +517,17 @@ hideFullReportButton.addEventListener("click", () => {
   fullReportToggle.focus({ preventScroll: true });
   analysisResult.scrollIntoView({ behavior: "smooth", block: "start" });
   speakText(`${riskBadge.innerText}. ${resultTitle.innerText}. ${resultSummary.innerText}`);
+});
+
+changeFollowUpButton.addEventListener("click", () => {
+  followUpsByMode[activeMode] = null;
+  followUpResult.hidden = true;
+  followUpStatus.hidden = true;
+  followUpStatus.textContent = "";
+  delete followUpStatus.dataset.state;
+  followUpQuestion.scrollIntoView({ behavior: "smooth", block: "start" });
+  const firstOption = followUpOptions.querySelector("button");
+  if (firstOption) firstOption.focus({ preventScroll: true });
 });
 
 chooseImagesAction.addEventListener("click", () => {

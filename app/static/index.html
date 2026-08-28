@@ -177,6 +177,37 @@
             <ol id="next-steps-list"></ol>
           </div>
 
+          <section class="follow-up-question" id="follow-up-question" hidden>
+            <p class="step-label">Get the right next step</p>
+            <h3>Have you already done any of these?</h3>
+            <p>Choose one answer. We’ll show what to do next.</p>
+            <div class="follow-up-options" id="follow-up-options"></div>
+            <div
+              aria-live="polite"
+              class="follow-up-status"
+              id="follow-up-status"
+              role="status"
+              hidden
+            ></div>
+          </section>
+
+          <section
+            aria-labelledby="follow-up-result-title"
+            class="follow-up-result"
+            id="follow-up-result"
+            tabindex="-1"
+            hidden
+          >
+            <p class="step-label">Your next steps</p>
+            <h3 id="follow-up-result-title"></h3>
+            <p class="follow-up-reassurance" id="follow-up-reassurance"></p>
+            <ol id="follow-up-steps"></ol>
+            <p class="urgent-note" id="urgent-note" hidden></p>
+            <button class="secondary-action" id="change-follow-up" type="button">
+              Choose a different answer
+            </button>
+          </section>
+
           <button
             aria-controls="full-report"
             aria-expanded="false"
