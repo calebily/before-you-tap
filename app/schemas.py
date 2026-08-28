@@ -14,6 +14,15 @@ class RiskLevel(StrEnum):
     HIGH_RISK = "high_risk"
 
 
+class FollowUpAction(StrEnum):
+    NOTHING_YET = "nothing_yet"
+    CLICKED_LINK = "clicked_link"
+    REPLIED_OR_CALLED = "replied_or_called"
+    SHARED_PRIVATE_INFORMATION = "shared_private_information"
+    SENT_MONEY = "sent_money"
+    STILL_UNSURE = "still_unsure"
+
+
 class WarningSign(BaseModel):
     title: str = Field(min_length=1, max_length=80)
     evidence: str = Field(min_length=1, max_length=240)
@@ -26,6 +35,24 @@ class AnalysisResult(BaseModel):
     warning_signs: list[WarningSign] = Field(default_factory=list, max_length=5)
     uncertainty: list[str] = Field(default_factory=list, max_length=3)
     safe_next_steps: list[str] = Field(min_length=1, max_length=3)
+    follow_up_options: list[FollowUpAction] = Field(
+        default_factory=lambda: [FollowUpAction.NOTHING_YET, FollowUpAction.STILL_UNSURE],
+        min_length=1,
+        max_length=5,
+    )
+
+
+class FollowUpRequest(BaseModel):
+    action: FollowUpAction
+    analysis: AnalysisResult
+
+
+class FollowUpResult(BaseModel):
+    action: FollowUpAction
+    heading: str = Field(min_length=1, max_length=100)
+    reassurance: str = Field(min_length=1, max_length=280)
+    next_steps: list[str] = Field(min_length=1, max_length=4)
+    urgent_note: str = Field(default="", max_length=240)
 
 
 class HealthResponse(BaseModel):
