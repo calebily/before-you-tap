@@ -1,28 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-labelledby="title desc">
-  <title id="title">Fictional Brightside Dental appointment reminder</title>
-  <desc id="desc">A calm fictional appointment reminder that asks for no payment, password, code, or personal information.</desc>
-  <rect width="900" height="1200" fill="#f3f5f8"/>
-  <rect x="65" y="70" width="770" height="1060" rx="28" fill="#ffffff" stroke="#d7dce3" stroke-width="3"/>
-  <circle cx="145" cy="155" r="42" fill="#dbeafe"/>
-  <path d="M130 133 C118 144 122 177 145 190 C168 177 172 144 160 133 C152 126 150 141 145 141 C140 141 138 126 130 133 Z" fill="#2458c6"/>
-  <text x="215" y="150" font-family="Arial, sans-serif" font-size="36" font-weight="700" fill="#111827">Brightside Dental</text>
-  <text x="215" y="187" font-family="Arial, sans-serif" font-size="20" fill="#6b7280">Fictional appointment reminder</text>
-  <line x1="115" y1="245" x2="785" y2="245" stroke="#e5e7eb" stroke-width="2"/>
+  <title id="title">Fictional dental appointment text reminder</title>
+  <desc id="desc">A realistic fictional phone message gives an appointment reminder without requesting payment, passwords, codes, or personal information.</desc>
+  <rect width="900" height="1200" fill="#e8eaed"/>
+  <rect x="108" y="18" width="684" height="1164" rx="72" fill="#161616"/>
+  <rect x="126" y="36" width="648" height="1128" rx="54" fill="#ffffff"/>
 
-  <text x="115" y="330" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#111827">Your appointment is coming up</text>
-  <text x="115" y="410" font-family="Arial, sans-serif" font-size="27" fill="#1f2937">Hi Alex,</text>
-  <text x="115" y="470" font-family="Arial, sans-serif" font-size="27" fill="#1f2937">This is a reminder for your routine check-up.</text>
+  <text x="168" y="92" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="25" font-weight="700" fill="#111111">2:18</text>
+  <rect x="652" y="67" width="30" height="18" rx="5" fill="none" stroke="#111111" stroke-width="3"/>
+  <rect x="684" y="72" width="4" height="8" rx="2" fill="#111111"/>
+  <rect x="656" y="71" width="20" height="10" rx="2" fill="#111111"/>
+  <path d="M610 83 C620 71 634 71 644 83 M616 88 C623 81 631 81 638 88" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="627" cy="93" r="3" fill="#111111"/>
 
-  <rect x="115" y="535" width="670" height="190" rx="18" fill="#eff6ff"/>
-  <text x="155" y="595" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#2458c6">DATE AND TIME</text>
-  <text x="155" y="652" font-family="Arial, sans-serif" font-size="32" font-weight="700" fill="#111827">Thursday, 30 August · 10:30 AM</text>
-  <text x="155" y="696" font-family="Arial, sans-serif" font-size="23" fill="#4b5563">Routine dental check-up</text>
+  <line x1="126" y1="118" x2="774" y2="118" stroke="#e5e5e7" stroke-width="2"/>
+  <path d="M171 175 L151 194 L171 213" fill="none" stroke="#1769e0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="450" cy="166" r="32" fill="#dce8f7"/>
+  <path d="M439 148 C427 157 431 185 450 194 C469 185 473 157 461 148 C455 143 454 157 450 157 C446 157 445 143 439 148 Z" fill="#315f9c"/>
+  <text x="450" y="218" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="25" font-weight="600" fill="#111111">Brightside Dental</text>
+  <text x="450" y="246" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="18" fill="#77777a">Text Message</text>
+  <line x1="126" y1="270" x2="774" y2="270" stroke="#e5e5e7" stroke-width="2"/>
 
-  <text x="115" y="805" font-family="Arial, sans-serif" font-size="26" fill="#1f2937">No action is needed if you can attend.</text>
-  <text x="115" y="860" font-family="Arial, sans-serif" font-size="24" fill="#4b5563">To reschedule, use the contact details from your</text>
-  <text x="115" y="900" font-family="Arial, sans-serif" font-size="24" fill="#4b5563">original booking confirmation or our official website.</text>
-  <text x="115" y="970" font-family="Arial, sans-serif" font-size="22" fill="#6b7280">This reminder does not request payment, passwords,</text>
-  <text x="115" y="1006" font-family="Arial, sans-serif" font-size="22" fill="#6b7280">verification codes, or personal information.</text>
+  <text x="450" y="316" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="18" font-weight="600" fill="#8a8a8e">Today 2:18 PM</text>
 
-  <text x="450" y="1080" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6b7280">Fictional demonstration message</text>
+  <rect x="160" y="350" width="568" height="205" rx="30" fill="#e9e9eb"/>
+  <text x="190" y="393" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">Hi Alex, this is a reminder that your</text>
+  <text x="190" y="433" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">routine dental check-up is booked for</text>
+  <text x="190" y="473" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" font-weight="600" fill="#111111">Thursday 30 August at 10:30 AM.</text>
+  <text x="190" y="518" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="24" fill="#4a4a4d">Brightside Dental</text>
+
+  <rect x="160" y="575" width="574" height="205" rx="30" fill="#e9e9eb"/>
+  <text x="190" y="618" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">No action is needed if you can attend.</text>
+  <text x="190" y="658" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">If you need to change the booking, use</text>
+  <text x="190" y="698" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">the number in your original confirmation.</text>
+  <text x="190" y="743" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="24" fill="#4a4a4d">Please do not reply to this message.</text>
+
+  <text x="160" y="821" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="18" fill="#8a8a8e">Delivered</text>
+
+  <rect x="154" y="1018" width="592" height="68" rx="34" fill="#ffffff" stroke="#c7c7cc" stroke-width="2"/>
+  <circle cx="188" cy="1052" r="23" fill="#b8b8bd"/>
+  <path d="M179 1052 h18 M188 1043 v18" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <text x="230" y="1061" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="23" fill="#9a9a9f">Text Message</text>
+
+  <text x="450" y="1130" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="16" fill="#6b6b70">Fictional test message</text>
 </svg>
