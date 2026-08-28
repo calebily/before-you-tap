@@ -3,7 +3,13 @@ from fastapi.testclient import TestClient
 import app.main as main_module
 from app.config import Settings
 from app.main import app
-from app.schemas import AnalysisResult, RiskLevel, WarningSign
+from app.schemas import (
+    AnalysisResult,
+    FollowUpAction,
+    FollowUpResult,
+    RiskLevel,
+    WarningSign,
+)
 
 client = TestClient(app)
 
@@ -32,6 +38,9 @@ def test_home_page_loads() -> None:
     assert "Drag an audio file here" in response.text
     assert "Remove audio" in response.text
     assert "See the full report" in response.text
+    assert "Have you already done any of these?" in response.text
+    assert 'id="follow-up-options"' in response.text
+    assert 'id="follow-up-result"' in response.text
 
 
 def test_logo_asset_loads() -> None:
@@ -242,3 +251,68 @@ def test_audio_analysis_rejects_an_image_before_calling_gemini(monkeypatch) -> N
 
     assert response.status_code == 400
     assert response.json()["detail"] == "Please choose a supported audio file only."
+
+
+def test_guided_follow_up_uses_only_the_structured_assessment(monkeypatch) -> None:
+    assessment = AnalysisResult(
+        risk_level=RiskLevel.HIGH_RISK,
+        summary="The message asks for a password through a suspicious link.",
+        warning_signs=[],
+        uncertainty=["The sender cannot be confirmed."],
+        safe_next_steps=["Pause and do not share more information."],
+        follow_up_options=[
+            FollowUpAction.NOTHING_YET,
+            FollowUpAction.CLICKED_LINK,
+            FollowUpAction.SHARED_PRIVATE_INFORMATION,
+        ],
+    )
+    expected = FollowUpResult(
+        action=FollowUpAction.CLICKED_LINK,
+        heading="Secure the account now",
+        reassurance="You can still take steps to protect the account.",
+        next_steps=[
+            "Close the page and do not enter any more information.",
+            "Open the official service app or type its website address yourself.",
+            "Change the password and review recent account activity.",
+        ],
+        urgent_note="If you entered banking details, call the bank using the number on your card.",
+    )
+
+    def fake_analyse_follow_up(*, request, settings):
+        assert request.action is FollowUpAction.CLICKED_LINK
+        assert request.analysis == assessment
+        assert settings.gemini_model == "gemini-3.5-flash"
+        return expected
+
+    monkeypatch.setattr(main_module, "analyse_follow_up", fake_analyse_follow_up)
+
+    response = client.post(
+        "/api/follow-up",
+        json={
+            "action": "clicked_link",
+            "analysis": assessment.model_dump(mode="json"),
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == expected.model_dump(mode="json")
+
+
+def test_guided_follow_up_rejects_an_uncontrolled_action() -> None:
+    assessment = AnalysisResult(
+        risk_level=RiskLevel.BE_CAREFUL,
+        summary="The request should be checked independently.",
+        warning_signs=[],
+        uncertainty=[],
+        safe_next_steps=["Use an official contact method."],
+    )
+
+    response = client.post(
+        "/api/follow-up",
+        json={
+            "action": "ask_anything_at_all",
+            "analysis": assessment.model_dump(mode="json"),
+        },
+    )
+
+    assert response.status_code == 422
