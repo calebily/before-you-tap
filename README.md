@@ -1,6 +1,6 @@
 # Before You Tap
 
-**A calm, multimodal scam-safety companion for older adults.**
+**Check suspicious messages and voice notes before you respond, pay, or share details.**
 
 [Live Cloud Run demo](https://before-you-tap-484523463568.australia-southeast1.run.app) ·
 [Architecture](docs/ARCHITECTURE.md) ·
@@ -16,8 +16,8 @@
 ## The problem
 
 Scam messages often succeed by creating urgency, fear, or confusion before a person has time to
-verify what they are being told. Before You Tap gives an older adult a calm second opinion before
-they tap a link, call back, pay, or share private information.
+verify what they are being told. Before You Tap helps an older adult check what looks suspicious
+and decide what to do before they tap a link, call back, pay, or share private information.
 
 The user selects suspicious content. Gemini then performs a structured multimodal safety workflow:
 
@@ -192,7 +192,7 @@ does not expose credentials and confirms the selected model, provider, and cloud
   instances and Google Cloud spending controls provide additional cost protection.
 - Gemini output is validated against strict Pydantic schemas and inserted into the page as text,
   never executable HTML.
-- Model, configuration, validation, and unreadable-file failures return calm error messages rather
+- Model, configuration, validation, and unreadable-file failures return clear error messages rather
   than fabricated safety results.
 
 ## Repository layout
