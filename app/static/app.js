@@ -32,6 +32,8 @@ const riskBadge = document.querySelector("#risk-badge");
 const resultTitle = document.querySelector("#result-title");
 const resultSummary = document.querySelector("#result-summary");
 const nextSteps = document.querySelector(".next-steps");
+const lowConcernReasonsSection = document.querySelector("#low-concern-reasons-section");
+const lowConcernReasonsList = document.querySelector("#low-concern-reasons-list");
 const warningSection = document.querySelector("#warning-section");
 const warningList = document.querySelector("#warning-list");
 const uncertaintySection = document.querySelector("#uncertainty-section");
@@ -147,6 +149,7 @@ function clearRenderedResult() {
   riskBadge.textContent = "";
   resultTitle.textContent = "";
   resultSummary.textContent = "";
+  lowConcernReasonsList.replaceChildren();
   warningList.replaceChildren();
   uncertaintyList.replaceChildren();
   nextStepsList.replaceChildren();
@@ -160,6 +163,7 @@ function clearRenderedResult() {
   followUpSteps.replaceChildren();
   urgentNote.hidden = true;
   urgentNote.textContent = "";
+  lowConcernReasonsSection.hidden = true;
   warningSection.hidden = true;
   uncertaintySection.hidden = true;
   fullReport.hidden = true;
@@ -178,6 +182,24 @@ function appendTextList(container, items) {
     const listItem = document.createElement("li");
     listItem.textContent = item;
     container.append(listItem);
+  });
+}
+
+function appendEvidenceCards(container, items, itemClass, evidenceClass) {
+  items.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = itemClass;
+
+    const title = document.createElement("h5");
+    title.textContent = item.title;
+    const evidence = document.createElement("p");
+    evidence.className = evidenceClass;
+    evidence.textContent = item.evidence;
+    const explanation = document.createElement("p");
+    explanation.textContent = item.explanation;
+
+    card.append(title, evidence, explanation);
+    container.append(card);
   });
 }
 
@@ -274,22 +296,19 @@ function renderResult(payload, { focus = true } = {}) {
   resultTitle.textContent = risk.title;
   resultSummary.textContent = payload.summary;
 
+  const lowConcernReasons = payload.low_concern_reasons || [];
+  if (payload.risk_level === "low_concern" && lowConcernReasons.length > 0) {
+    appendEvidenceCards(
+      lowConcernReasonsList,
+      lowConcernReasons,
+      "low-concern-reason-item",
+      "low-concern-reason-evidence",
+    );
+    lowConcernReasonsSection.hidden = false;
+  }
+
   if (payload.warning_signs.length > 0) {
-    payload.warning_signs.forEach((warning) => {
-      const card = document.createElement("article");
-      card.className = "warning-item";
-
-      const title = document.createElement("h5");
-      title.textContent = warning.title;
-      const evidence = document.createElement("p");
-      evidence.className = "warning-evidence";
-      evidence.textContent = warning.evidence;
-      const explanation = document.createElement("p");
-      explanation.textContent = warning.explanation;
-
-      card.append(title, evidence, explanation);
-      warningList.append(card);
-    });
+    appendEvidenceCards(warningList, payload.warning_signs, "warning-item", "warning-evidence");
     warningSection.hidden = false;
   }
 

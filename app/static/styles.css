@@ -625,24 +625,36 @@ h5 {
   font-size: 1.35rem;
 }
 
-.warning-list {
+.warning-list,
+.low-concern-reasons-list {
   display: grid;
   gap: 12px;
 }
 
-.warning-item {
+.warning-item,
+.low-concern-reason-item {
   padding: 16px;
-  border-left: 5px solid #f2b84b;
   border-radius: 0 14px 14px 0;
+}
+
+.warning-item {
+  border-left: 5px solid #f2b84b;
   background: #faf7ef;
 }
 
-.warning-item p {
+.low-concern-reason-item {
+  border-left: 5px solid #3fa66b;
+  background: #f1faf5;
+}
+
+.warning-item p,
+.low-concern-reason-item p {
   margin: 6px 0 0;
   line-height: 1.5;
 }
 
-.warning-evidence {
+.warning-evidence,
+.low-concern-reason-evidence {
   font-weight: 750;
 }
 

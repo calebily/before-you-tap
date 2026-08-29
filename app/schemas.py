@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class MediaKind(StrEnum):
@@ -29,10 +29,17 @@ class WarningSign(BaseModel):
     explanation: str = Field(min_length=1, max_length=320)
 
 
+class LowConcernReason(BaseModel):
+    title: str = Field(min_length=1, max_length=80)
+    evidence: str = Field(min_length=1, max_length=240)
+    explanation: str = Field(min_length=1, max_length=320)
+
+
 class AnalysisResult(BaseModel):
     risk_level: RiskLevel
     summary: str = Field(min_length=1, max_length=360)
     warning_signs: list[WarningSign] = Field(default_factory=list, max_length=5)
+    low_concern_reasons: list[LowConcernReason] = Field(default_factory=list, max_length=3)
     uncertainty: list[str] = Field(default_factory=list, max_length=3)
     safe_next_steps: list[str] = Field(min_length=1, max_length=3)
     follow_up_options: list[FollowUpAction] = Field(
@@ -40,6 +47,23 @@ class AnalysisResult(BaseModel):
         min_length=1,
         max_length=5,
     )
+
+    @model_validator(mode="after")
+    def keep_low_concern_reasoning_visible(self) -> "AnalysisResult":
+        if self.risk_level is RiskLevel.LOW_CONCERN and not self.low_concern_reasons:
+            self.low_concern_reasons = [
+                LowConcernReason(
+                    title="No strong warning signs found",
+                    evidence=self.summary[:240],
+                    explanation=(
+                        "This supports a Low concern result, but it does not confirm the sender "
+                        "or guarantee that the message is safe."
+                    ),
+                )
+            ]
+        elif self.risk_level is not RiskLevel.LOW_CONCERN:
+            self.low_concern_reasons = []
+        return self
 
 
 class FollowUpRequest(BaseModel):
