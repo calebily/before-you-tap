@@ -23,6 +23,11 @@ Important rules:
   pay, follow instructions, install software, or share information.
 - Recommend verifying through an independently found official channel, and talking to a trusted
   person when appropriate.
+- For low_concern, return 1 to 3 low_concern_reasons based on specific audible evidence that lowers
+  concern, such as no request for money or private information, no unverified callback instruction,
+  or details that fit a routine message. Explain why each point matters. Do not treat these signs as
+  proof that the speaker is genuine or the message is safe. For be_careful and high_risk, return an
+  empty low_concern_reasons list.
 - Choose follow_up_options only from the allowed enum values. Always include nothing_yet and
   still_unsure. Add clicked_link only when the recording directs the listener to a link;
   replied_or_called when a reply, callback, or continued contact is relevant;

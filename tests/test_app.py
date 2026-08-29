@@ -7,6 +7,7 @@ from app.schemas import (
     AnalysisResult,
     FollowUpAction,
     FollowUpResult,
+    LowConcernReason,
     RiskLevel,
     WarningSign,
 )
@@ -38,9 +39,54 @@ def test_home_page_loads() -> None:
     assert "Drag an audio file here" in response.text
     assert "Remove audio" in response.text
     assert "See the full report" in response.text
+    assert "Why this looks routine" in response.text
+    assert 'id="low-concern-reasons-list"' in response.text
     assert "Have you already done any of these?" in response.text
     assert 'id="follow-up-options"' in response.text
     assert 'id="follow-up-result"' in response.text
+
+
+def test_low_concern_result_keeps_its_reasoning_visible() -> None:
+    result = AnalysisResult(
+        risk_level=RiskLevel.LOW_CONCERN,
+        summary=(
+            "The message looks like a routine appointment reminder and does not ask for money, "
+            "passwords, or immediate action."
+        ),
+        warning_signs=[],
+        uncertainty=["The sender cannot be confirmed from the message alone."],
+        safe_next_steps=["Use a trusted clinic number if you need to change the appointment."],
+    )
+
+    assert result.low_concern_reasons == [
+        LowConcernReason(
+            title="No strong warning signs found",
+            evidence=result.summary,
+            explanation=(
+                "This supports a Low concern result, but it does not confirm the sender or "
+                "guarantee that the message is safe."
+            ),
+        )
+    ]
+
+
+def test_non_low_concern_result_does_not_show_reassuring_evidence() -> None:
+    result = AnalysisResult(
+        risk_level=RiskLevel.HIGH_RISK,
+        summary="The message asks for a security code and an urgent transfer.",
+        low_concern_reasons=[
+            LowConcernReason(
+                title="Routine wording",
+                evidence="The message includes a greeting.",
+                explanation="A greeting alone does not lower the risk.",
+            )
+        ],
+        warning_signs=[],
+        uncertainty=[],
+        safe_next_steps=["Pause and contact the bank through an official channel."],
+    )
+
+    assert result.low_concern_reasons == []
 
 
 def test_home_page_has_browser_security_headers() -> None:

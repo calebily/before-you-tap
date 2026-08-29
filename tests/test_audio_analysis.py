@@ -39,6 +39,8 @@ def test_builds_a_structured_audio_gemini_request(monkeypatch) -> None:
     assert len(calls["contents"]) == 2
     assert calls["contents"][1].inline_data.mime_type == "audio/wav"
     assert calls["contents"][1].inline_data.data.endswith(b"fictional")
+    assert "return 1 to 3 low_concern_reasons" in calls["contents"][0]
+    assert "Do not treat" in calls["contents"][0]
     assert calls["config"].response_mime_type == "application/json"
 
 

@@ -28,6 +28,11 @@ Important rules:
   numbers in the message, or share information.
 - Recommend verifying through an independently found official channel, and talking to a trusted
   person when appropriate.
+- For low_concern, return 1 to 3 low_concern_reasons based on specific visible evidence that lowers
+  concern, such as no request for money or private information, no link or unverified contact
+  instruction, or details that fit a routine message. Explain why each point matters. Do not treat
+  these signs as proof that the sender is genuine or the message is safe. For be_careful and
+  high_risk, return an empty low_concern_reasons list.
 - Choose follow_up_options only from the allowed enum values. Always include nothing_yet and
   still_unsure. Add clicked_link only when a link or button is visible; replied_or_called when a
   reply, call, or continued contact is relevant; shared_private_information when personal,
