@@ -3,9 +3,7 @@
 **Check suspicious messages and voice notes before you respond, pay, or share details.**
 
 [Live Cloud Run demo](https://before-you-tap-484523463568.australia-southeast1.run.app) ·
-[Architecture](docs/ARCHITECTURE.md) ·
-[MVP specification](docs/MVP_SPEC.md) ·
-[Demo plan](docs/DEMO_SCRIPT.md)
+[Architecture](docs/ARCHITECTURE.md)
 
 - **Hackathon:** All Things Agentic Hackathon
 - **Track:** The Collaborative Partner
@@ -69,7 +67,7 @@ the current check and the safety instructions defined in this repository.
 
 ## Architecture
 
-![Before You Tap architecture](docs/architecture.svg)
+![Before You Tap architecture](docs/architecture-final.svg)
 
 The full data-flow and trust-boundary explanation is in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -181,7 +179,6 @@ does not expose credentials and confirms the selected model, provider, and cloud
 ## Privacy, security, and failure handling
 
 - Do not commit credentials, real private messages, or real voicemail files.
-- Demo assets are fictional and contain no real account, contact, or identity data.
 - Uploaded content is processed in memory for the current request and is not intentionally retained
   by the application.
 - Uploaded media is restricted by count, total size, declared MIME type, and file signature.
@@ -200,7 +197,7 @@ does not expose credentials and confirms the selected model, provider, and cloud
 ```text
 app/                 FastAPI application and accessible web UI
 app/services/        File validation, Gemini analysis, and guided follow-up
-docs/                Specification, architecture, demo, and submission material
+docs/                Architecture diagram and system explanation
 tests/               Automated unit and API tests
 ```
 
