@@ -67,7 +67,7 @@ the current check and the safety instructions defined in this repository.
 
 ## Architecture
 
-![Before You Tap architecture](docs/architecture.svg)
+![Before You Tap architecture](docs/architecture-final.svg)
 
 The full data-flow and trust-boundary explanation is in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
