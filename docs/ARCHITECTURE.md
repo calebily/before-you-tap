@@ -4,18 +4,7 @@ Before You Tap is a stateless, multimodal web agent deployed as one Cloud Run se
 holds the current assessment only for the active page session. No database or long-term user memory
 is used in the MVP.
 
-```mermaid
-flowchart TD
-    U["Older adult"] --> D["Phone or desktop"]
-    D --> F["Accessible web interface"]
-    F -->|"Selected images or saved audio"| C["FastAPI on Cloud Run"]
-    C --> V["File and request validation"]
-    V --> G["Google GenAI SDK"]
-    G --> X["Gemini 3.5 Flash on Vertex AI"]
-    X --> S["Pydantic-validated structured result"]
-    S --> F
-    F -->|"Assessment plus selected action only"| C
-```
+![Before You Tap system architecture](architecture-final.svg)
 
 The upload and guided follow-up paths share the same Cloud Run backend but minimise the data sent
 at each step:
