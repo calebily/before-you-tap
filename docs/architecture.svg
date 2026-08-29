@@ -25,12 +25,13 @@
   <text class="title" x="600" y="58" text-anchor="middle">Before You Tap — System Architecture</text>
   <text class="subtitle" x="600" y="88" text-anchor="middle">Multimodal scam-safety workflow with transient session state</text>
 
-  <rect class="box" x="55" y="200" width="230" height="170"/>
-  <circle cx="100" cy="245" r="21" fill="#111827"/>
-  <rect x="90" y="232" width="20" height="26" rx="3" fill="none" stroke="#ffffff" stroke-width="2"/>
-  <text class="label" x="85" y="300">Phone or desktop</text>
-  <text class="body" x="85" y="330">Accessible web UI</text>
-  <text class="body" x="85" y="352">Transient browser state</text>
+  <rect class="box" x="55" y="190" width="230" height="190"/>
+  <circle cx="100" cy="235" r="21" fill="#111827"/>
+  <rect x="90" y="222" width="20" height="26" rx="3" fill="none" stroke="#ffffff" stroke-width="2"/>
+  <text class="label" x="85" y="290">Older adult</text>
+  <text class="body" x="85" y="318">Phone or desktop</text>
+  <text class="body" x="85" y="340">Accessible web UI</text>
+  <text class="body" x="85" y="362">Transient browser state</text>
 
   <rect class="cloud" x="365" y="130" width="470" height="420"/>
   <text class="small" x="400" y="170">GOOGLE CLOUD — CLOUD RUN</text>

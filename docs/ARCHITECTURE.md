@@ -6,7 +6,8 @@ is used in the MVP.
 
 ```mermaid
 flowchart TD
-    U["Older adult on phone or desktop"] --> F["Accessible web interface"]
+    U["Older adult"] --> D["Phone or desktop"]
+    D --> F["Accessible web interface"]
     F -->|"Selected images or saved audio"| C["FastAPI on Cloud Run"]
     C --> V["File and request validation"]
     V --> G["Google GenAI SDK"]
@@ -52,4 +53,4 @@ at each step:
 
 The application does not intentionally store uploaded media, generated transcripts, or assessments.
 Cloud provider processing and operational logs remain subject to the configured Google Cloud
-project and its policies. Demo assets are fictional and contain no real personal information.
+project and its policies.
