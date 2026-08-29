@@ -13,3 +13,10 @@ build/
 uploads/
 tmp/
 
+# Keep locally recorded demo voices out of the public repository.
+demo_assets/*.m4a
+demo_assets/*.mp3
+demo_assets/*.wav
+demo_assets/*.ogg
+demo_assets/*.webm
+

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Fictional bank scam text conversation, page two</title>
+  <desc id="desc">A realistic fictional phone message asks for a security code, a transfer to a safety account, and secrecy.</desc>
+  <rect width="900" height="1200" fill="#e8eaed"/>
+  <rect x="108" y="18" width="684" height="1164" rx="72" fill="#161616"/>
+  <rect x="126" y="36" width="648" height="1128" rx="54" fill="#ffffff"/>
+
+  <text x="168" y="92" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="25" font-weight="700" fill="#111111">9:43</text>
+  <rect x="652" y="67" width="30" height="18" rx="5" fill="none" stroke="#111111" stroke-width="3"/>
+  <rect x="684" y="72" width="4" height="8" rx="2" fill="#111111"/>
+  <rect x="656" y="71" width="20" height="10" rx="2" fill="#111111"/>
+  <path d="M610 83 C620 71 634 71 644 83 M616 88 C623 81 631 81 638 88" fill="none" stroke="#111111" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="627" cy="93" r="3" fill="#111111"/>
+
+  <line x1="126" y1="118" x2="774" y2="118" stroke="#e5e5e7" stroke-width="2"/>
+  <path d="M171 175 L151 194 L171 213" fill="none" stroke="#1769e0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="450" cy="166" r="32" fill="#d9dde3"/>
+  <text x="450" y="177" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="30" font-weight="700" fill="#4a4a4d">H</text>
+  <text x="450" y="218" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="25" font-weight="600" fill="#111111">Harbourline Alert</text>
+  <text x="450" y="246" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="18" fill="#77777a">Text Message</text>
+  <line x1="126" y1="270" x2="774" y2="270" stroke="#e5e5e7" stroke-width="2"/>
+
+  <text x="450" y="316" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="18" font-weight="600" fill="#8a8a8e">Today 9:43 AM</text>
+
+  <rect x="160" y="350" width="560" height="165" rx="30" fill="#e9e9eb"/>
+  <text x="190" y="393" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">To stop the transfer, reply with the</text>
+  <text x="190" y="433" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">6-digit security code sent to your</text>
+  <text x="190" y="473" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">phone.</text>
+
+  <rect x="160" y="535" width="574" height="205" rx="30" fill="#e9e9eb"/>
+  <text x="190" y="578" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">Then move your balance to our</text>
+  <text x="190" y="618" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">temporary Safety Account.</text>
+  <text x="190" y="668" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" font-weight="600" fill="#111111">BSB 000-111 · Account 12345678</text>
+  <text x="190" y="708" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="24" fill="#4a4a4d">Your money will be returned after review.</text>
+
+  <rect x="160" y="760" width="560" height="165" rx="30" fill="#e9e9eb"/>
+  <text x="190" y="803" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">Do not call the bank or tell anyone</text>
+  <text x="190" y="843" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">until this security check is complete.</text>
+  <text x="190" y="883" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="27" fill="#111111">This may cancel the protection.</text>
+
+  <rect x="154" y="1018" width="592" height="68" rx="34" fill="#ffffff" stroke="#c7c7cc" stroke-width="2"/>
+  <circle cx="188" cy="1052" r="23" fill="#b8b8bd"/>
+  <path d="M179 1052 h18 M188 1043 v18" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <text x="230" y="1061" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="23" fill="#9a9a9f">Text Message</text>
+
+</svg>

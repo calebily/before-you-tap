@@ -43,6 +43,62 @@ def test_home_page_loads() -> None:
     assert 'id="follow-up-result"' in response.text
 
 
+def test_home_page_has_browser_security_headers() -> None:
+    response = client.get("/")
+
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
+    assert response.headers["referrer-policy"] == "no-referrer"
+    assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
+    assert "object-src 'none'" in response.headers["content-security-policy"]
+    assert "microphone=()" in response.headers["permissions-policy"]
+    assert "camera=(self)" in response.headers["permissions-policy"]
+
+
+def test_api_responses_are_not_cached() -> None:
+    response = client.get("/api/health")
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"
+
+
+def test_rejects_cross_origin_browser_api_requests() -> None:
+    png = b"\x89PNG\r\n\x1a\nfictional image bytes"
+
+    response = client.post(
+        "/api/uploads/validate",
+        headers={"Origin": "https://malicious.example"},
+        files={"file": ("fictional.png", png, "image/png")},
+    )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Cross-origin API requests are not allowed."
+    assert response.headers["cache-control"] == "no-store"
+
+
+def test_allows_same_origin_browser_api_requests() -> None:
+    png = b"\x89PNG\r\n\x1a\nfictional image bytes"
+
+    response = client.post(
+        "/api/uploads/validate",
+        headers={"Origin": "http://testserver"},
+        files={"file": ("fictional.png", png, "image/png")},
+    )
+
+    assert response.status_code == 200
+
+
+def test_rejects_an_oversized_request_before_parsing_uploads() -> None:
+    response = client.post(
+        "/api/analyse/audio",
+        headers={"Content-Length": str((21 * 1024 * 1024) + 1)},
+        content=b"not parsed",
+    )
+
+    assert response.status_code == 413
+    assert response.json()["detail"] == "The request is too large."
+
+
 def test_logo_asset_loads() -> None:
     response = client.get("/static/logo.svg")
 

@@ -1,4 +1,5 @@
-from pydantic import SecretStr
+import pytest
+from pydantic import SecretStr, ValidationError
 
 from app.config import Settings
 
@@ -30,3 +31,8 @@ def test_vertex_ai_requires_a_cloud_project() -> None:
         google_cloud_project="fictional-project",
     )
     assert configured.ai_configured is True
+
+
+def test_upload_limit_cannot_be_configured_above_twenty_megabytes() -> None:
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, max_upload_mb=21)
