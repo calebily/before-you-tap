@@ -1,5 +1,7 @@
 # Before You Tap
 
+<img width="1536" height="1024" alt="Before You Tap" src="https://github.com/user-attachments/assets/477a6de4-b64e-4610-a142-e84676d52d6f" />
+
 **Check suspicious messages and voice notes before you respond, pay, or share details.**
 
 [Live Cloud Run demo](https://before-you-tap-484523463568.australia-southeast1.run.app) ·
